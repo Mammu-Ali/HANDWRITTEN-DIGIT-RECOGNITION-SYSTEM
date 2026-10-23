@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Software Requirements Specification (SRS)</title>
+    <style>
+        
+@page {
+    size: A4 portrait;
+    margin: 12mm 14mm 12mm 14mm;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1e293b;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+    font-size: 8.5pt;
+    line-height: 1.4;
+}
+
+.page {
+    page-break-after: always;
+    break-after: page;
+    height: 270mm;
+    max-height: 270mm;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    padding: 2mm 0;
+}
+
+.page:last-child {
+    page-break-after: auto;
+    break-after: auto;
+}
+
+.page-header {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1.5px solid #0284c7;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+    font-size: 7.5pt;
+    font-weight: 600;
+    color: #0369a1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.page-footer {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #cbd5e1;
+    padding-top: 4px;
+    margin-top: 6px;
+    font-size: 7.5pt;
+    color: #64748b;
+}
+
+.page-content {
+    flex: 1 1 auto;
+    overflow: hidden;
+}
+
+h1.page-title {
+    font-size: 13pt;
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 2px solid #2563eb;
+    padding-bottom: 3px;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.3px;
+}
+
+h2 {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin: 8px 0 4px 0;
+    border-left: 3px solid #3b82f6;
+    padding-left: 6px;
+}
+
+h3 {
+    font-size: 9pt;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 6px 0 3px 0;
+}
+
+p {
+    margin: 0 0 5px 0;
+    color: #334155;
+    text-align: justify;
+}
+
+ul, ol {
+    margin: 0 0 6px 0;
+    padding-left: 18px;
+}
+
+li {
+    margin-bottom: 2px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 6px 0 8px 0;
+    font-size: 7.8pt;
+}
+
+th {
+    background: #1e40af;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 4px 6px;
+    text-align: left;
+    border: 1px solid #1e3a8a;
+}
+
+td {
+    padding: 3.5px 6px;
+    border: 1px solid #cbd5e1;
+    color: #1e293b;
+}
+
+tr:nth-child(even) td {
+    background-color: #f8fafc;
+}
+
+pre {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-family: Consolas, "Liberation Mono", Courier, monospace;
+    font-size: 7.5pt;
+    line-height: 1.25;
+    margin: 4px 0 6px 0;
+    overflow: hidden;
+    white-space: pre-wrap;
+}
+
+code {
+    font-family: Consolas, "Liberation Mono", Courier, monospace;
+    font-size: 8pt;
+    background: #e2e8f0;
+    color: #0f172a;
+    padding: 1px 3px;
+    border-radius: 3px;
+}
+
+.math-display {
+    background: #f1f5f9;
+    border-left: 3px solid #6366f1;
+    padding: 4px 8px;
+    margin: 4px 0 6px 0;
+    font-family: "Cambria Math", "Times New Roman", serif;
+    font-size: 8.8pt;
+    color: #1e1b4b;
+    font-style: italic;
+}
+
+.cover-card {
+    border: 2px solid #1e3a8a;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    margin: 10px 0 16px 0;
+}
+
+.cover-title {
+    font-size: 16pt;
+    font-weight: 800;
+    color: #1e3a8a;
+    margin-bottom: 8px;
+    line-height: 1.2;
+}
+
+.cover-subtitle {
+    font-size: 10pt;
+    font-weight: 600;
+    color: #0369a1;
+    margin-bottom: 12px;
+}
+
+.cover-meta {
+    font-size: 8pt;
+    color: #475569;
+    margin: 3px 0;
+}
+
+.diagram-card {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin: 6px 0;
+    font-family: Consolas, monospace;
+    font-size: 7.5pt;
+}
+
+.diagram-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 4px 0;
+    flex-wrap: wrap;
+}
+
+.diagram-node {
+    background: #ffffff;
+    border: 1.5px solid #2563eb;
+    border-radius: 4px;
+    padding: 4px 6px;
+    text-align: center;
+    font-weight: 600;
+    color: #1e40af;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.diagram-node.dark {
+    background: #1e40af;
+    color: #ffffff;
+    border-color: #1e3a8a;
+}
+
+.diagram-arrow {
+    color: #64748b;
+    font-weight: bold;
+    font-size: 10pt;
+}
+
+.badge {
+    display: inline-block;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 7pt;
+    font-weight: 600;
+}
+.badge-blue { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+.badge-green { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+.badge-orange { background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; }
+
+.highlight-box {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-left: 3px solid #2563eb;
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin: 6px 0;
+    font-size: 8pt;
+}
+
+    </style>
+</head>
+<body>
+    
+        <div class="page" id="srs-page-1">
+            <div class="page-header">
+                <span>Software Requirements Specification (SRS) &bull; IEEE Std 830-1998</span>
+                <span>Baseline v1.0.0</span>
+            </div>
+            <div class="page-content">
+                <h1 class="page-title">PRODUCT OVERVIEW & MACHINE LEARNING MODEL SPECIFICATIONS</h1>
+                <h3>1. Introduction, Purpose and Scope</h3>
+<p>This Software Requirements Specification (SRS) details the operational, functional, architectural, and mathematical requirements for the <strong>Handwritten Digit Recognition System</strong>. The application delivers real-time inference of isolated handwritten numerical digits (<i style="font-family: serif;">0</i> through <i style="font-family: serif;">9</i>) using a Convolutional Neural Network (CNN) integrated into a Python Flask web service with client-side canvas interactions, persistent SQLite storage, and analytics visualization.</p>
+<h3>2. Overall System Description &amp; Operational Context</h3>
+<p>The system operates as a self-contained, three-tier web application:</p>
+<ul>
+<li><strong>Client Tier:</strong> HTML5 Canvas (high-DPI, touch/stylus/mouse enabled), Bootstrap 5, Chart.js 4.</li>
+<li><strong>Application Tier:</strong> Python 3.12 Flask REST server executing image transformation, preprocessing, and TensorFlow/Keras inference.</li>
+<li><strong>Data Tier:</strong> Embedded SQLite 3 (<code>history.db</code>) for transaction logging and <code>digit_model.keras</code> for model weights.</li>
+</ul>
+<hr />
+<h3>3. Machine Learning &amp; Deep Learning Model Specifications</h3>
+<div class="diagram-card"><div class="diagram-row"><div class="diagram-node">InputInput Tensor - 28, 28, 1</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">Conv1Conv2D 32, 3x3 - ReLU | 320 params</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">Conv1</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">Pool1MaxPool 2x2 - 13, 13, 32</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">Pool1</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">Conv2Conv2D 64, 3x3 - ReLU | 18,496 params</div></div></div>
+<h4>3.1 Model Topology &amp; Parameter Derivation</h4>
+<p>The classification engine employs a sequential Convolutional Neural Network containing <strong>225,034 total trainable parameters</strong> (zero non-trainable parameters) across the following topological layers:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Layer Identifier</th>
+<th style="text-align:left">Layer Type</th>
+<th style="text-align:left">Output Shape</th>
+<th style="text-align:left">Kernel / Receptive Field</th>
+<th style="text-align:left">Activation</th>
+<th style="text-align:left">Parameter Calculation</th>
+<th style="text-align:center">Trainable Params</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>digit_input</code></td>
+<td style="text-align:left">InputLayer</td>
+<td style="text-align:left"><i style="font-family: serif;">(28, 28, 1)</i></td>
+<td style="text-align:left">—</td>
+<td style="text-align:left">—</td>
+<td style="text-align:left"><i style="font-family: serif;">0</i></td>
+<td style="text-align:center"><i style="font-family: serif;">0</i></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>conv_1</code></td>
+<td style="text-align:left">Conv2D</td>
+<td style="text-align:left"><i style="font-family: serif;">(26, 26, 32)</i></td>
+<td style="text-align:left"><i style="font-family: serif;">3 × 3</i>, Stride 1, Valid</td>
+<td style="text-align:left">ReLU</td>
+<td style="text-align:left"><i style="font-family: serif;">(3 × 3 × 1 + 1) × 32</i></td>
+<td style="text-align:center"><strong>320</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pool_1</code></td>
+<td style="text-align:left">MaxPooling2D</td>
+<td style="text-align:left"><i style="font-family: serif;">(13, 13, 32)</i></td>
+<td style="text-align:left"><i style="font-family: serif;">2 × 2</i>, Stride 2</td>
+<td style="text-align:left">—</td>
+<td style="text-align:left">None</td>
+<td style="text-align:center"><i style="font-family: serif;">0</i></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>conv_2</code></td>
+<td style="text-align:left">Conv2D</td>
+<td style="text-align:left"><i style="font-family: serif;">(11, 11, 64)</i></td>
+<td style="text-align:left"><i style="font-family: serif;">3 × 3</i>, Stride 1, Valid</td>
+<td style="text-align:left">ReLU</td>
+<td style="text-align:left"><i style="font-family: serif;">(3 × 3 × 32 + 1) × 64</i></td>
+<td style="text-align:center"><strong>18,496</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pool_2</code></td>
+<td style="text-align:left">MaxPooling2D</td>
+<td style="text-align:left"><i style="font-family: serif;">(5, 5, 64)</i></td>
+<td style="text-align:left"><i style="font-family: serif;">2 × 2</i>, Stride 2</td>
+<td style="text-align:left">—</td>
+<td style="text-align:left">None</td>
+<td style="text-align:center"><i style="font-family: serif;">0</i></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>dropout_conv</code></td>
+<td style="text-align:left">Dropout</td>
+<td style="text-align:left"><i style="font-family: serif;">(5, 5, 64)</i></td>
+<td style="text-align:left">Rate = <i style="font-family: serif;">0.25</i></td>
+<td style="text-align:left">—</td>
+<td style="text-align:left">None</td>
+<td style="text-align:center"><i style="font-family: serif;">0</i></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>flatten</code></td>
+<td style="text-align:left">Flatten</td>
+<td style="text-align:left"><i style="font-family: serif;">(1600)</i></td>
+<td style="text-align:left"><i style="font-family: serif;">5 × 5 × 64</i> units</td>
+<td style="text-align:left">—</td>
+<td style="text-align:left">None</td>
+<td style="text-align:center"><i style="font-family: serif;">0</i></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>dense_hidden</code></td>
+<td style="text-align:left">Dense</td>
+<td style="text-align:left"><i style="font-family: serif;">(128)</i></td>
+<td style="text-align:left">Fully connected</td>
+<td style="text-align:left">ReLU</td>
+<td style="text-align:left"><i style="font-family: serif;">(1600 + 1) × 128</i></td>
+<td style="text-align:center"><strong>204,928</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>dropout_dense</code></td>
+<td style="text-align:left">Dropout</td>
+<td style="text-align:left"><i style="font-family: serif;">(128)</i></td>
+<td style="text-align:left">Rate = <i style="font-family: serif;">0.50</i></td>
+<td style="text-align:left">—</td>
+<td style="text-align:left">None</td>
+<td style="text-align:center"><i style="font-family: serif;">0</i></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>digit_probs</code></td>
+<td style="text-align:left">Dense</td>
+<td style="text-align:left"><i style="font-family: serif;">(10)</i></td>
+<td style="text-align:left">10 output classes</td>
+<td style="text-align:left">Softmax</td>
+<td style="text-align:left"><i style="font-family: serif;">(128 + 1) × 10</i></td>
+<td style="text-align:center"><strong>1,290</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>TOTAL</strong></td>
+<td style="text-align:left">—</td>
+<td style="text-align:left">—</td>
+<td style="text-align:left">—</td>
+<td style="text-align:left">—</td>
+<td style="text-align:left"><strong>All Trainable</strong></td>
+<td style="text-align:center"><strong>225,034</strong></td>
+</tr>
+</tbody>
+</table>
+<h4>3.2 Mathematical Formulation of Output Probabilities</h4>
+<p>Logits <i style="font-family: serif;">z_k</i> produced by <code>digit_probs</code> are normalized via the categorical Softmax activation function:</p>
+<div class="math-display">p_k = &sigma;(<b>z</b>)_k = (e^(z_k))(&sum;_(j=0)^(9) e^(z_j)), \quad &forall; k &isin; \(0, 1, \dots, 9\), \quad (such that) \quad &sum;_(k=0)^(9) p_k = 1.0</div>
+The predicted digit is determined by the maximum likelihood class: <i style="font-family: serif;">\hat{y} = \arg\max_{k &isin; \{0, \dots, 9\}} p_k</i>, with confidence <i style="font-family: serif;">c = \max_k p_k</i>.
+<h4>3.3 Training Strategy &amp; Optimization Configuration</h4>
+<ul>
+<li><strong>Dataset:</strong> Modified NIST (MNIST) consisting of <i style="font-family: serif;">60,000</i> training images and <i style="font-family: serif;">10,000</i> test images.</li>
+<li><strong>Loss Function:</strong> Sparse Categorical Cross-Entropy: <i style="font-family: serif;">\mathcal{L} = -\frac{1}{N}\sum_{i=1}^N \log(σ(\mathbf{z}^{(i)})_{y^{(i)}})</i>.</li>
+<li><strong>Optimizer:</strong> Adam (<i style="font-family: serif;">α = 0.001</i>, <i style="font-family: serif;">β_1 = 0.9</i>, <i style="font-family: serif;">β_2 = 0.999</i>, <i style="font-family: serif;">\epsilon = 10^{-7}</i>).</li>
+<li><strong>Batch Size &amp; Epochs:</strong> Mini-batch size of <i style="font-family: serif;">128</i> over <i style="font-family: serif;">6</i> full training epochs.</li>
+<li><strong>Reproducibility:</strong> Seed fixed across environments (<code>seed=42</code>).</li>
+</ul>
+<h4>3.4 Verified Evaluation Performance Metrics</h4>
+<p>Evaluated on the <i style="font-family: serif;">10,000</i>-sample MNIST test dataset (from <code>evaluation_metrics.json</code>):</p>
+<ul>
+<li><strong>Test Classification Accuracy:</strong> <strong>99.10%</strong> (<i style="font-family: serif;">9,910 / 10,000</i> correct classifications)</li>
+<li><strong>Categorical Cross-Entropy Test Loss:</strong> <strong>0.0262</strong></li>
+<li><strong>Macro-Averaged Precision / Recall / F1-Score:</strong> <strong>0.9910 / 0.9909 / 0.9909</strong></li>
+<li><strong>Per-Class F1-Scores:</strong> <code>0</code>: 0.9919 | <code>1</code>: 0.9956 | <code>2</code>: 0.9923 | <code>3</code>: 0.9911 | <code>4</code>: 0.9954 | <code>5</code>: 0.9865 | <code>6</code>: 0.9895 | <code>7</code>: 0.9884 | <code>8</code>: 0.9918 | <code>9</code>: 0.9865</li>
+</ul>
+<h4>3.5 6-Stage Computer Vision Preprocessing Pipeline</h4>
+<p>Input images pass through a standardized transformation sequence in <code>image_processing.py</code>:</p>
+<ol>
+<li><strong>Decode &amp; Format Check:</strong> Enforces PNG/JPEG/JPG formats and <i style="font-family: serif;">≤ 2\text{MB}</i> payload size.</li>
+<li><strong>Grayscale &amp; Alpha Compositing:</strong> Projects RGBA/RGB to single-channel 8-bit luminance (<i style="font-family: serif;">L = 0.299R + 0.587G + 0.114B</i>).</li>
+<li><strong>Adaptive Polarity Inversion:</strong> Computes border perimeter intensity mean <i style="font-family: serif;">μ<em>{\text{border}}</i>. If <i style="font-family: serif;">μ</em>{\text{border}} &gt; 127.5</i> (dark-on-light), pixels invert (<i style="font-family: serif;">I' = 255 - I</i>).</li>
+<li><strong>Bounding Box Cropping &amp; Blank Guard:</strong> Masks pixels with threshold <i style="font-family: serif;">T=30</i>. If foreground <i style="font-family: serif;">&lt; 10</i> pixels or dynamic range <i style="font-family: serif;">&lt; 15</i>, raises <code>BlankImageError</code>.</li>
+<li><strong>Aspect-Ratio Preserving Resize:</strong> Scales largest bounding box dimension to <i style="font-family: serif;">20\text{px}</i> using Lanczos resampling.</li>
+<li><strong>Center of Mass (CoM) Centroid Shift:</strong> Centers digit in <i style="font-family: serif;">28 × 28</i> matrix and shifts by <i style="font-family: serif;">(Δ x, Δ y) = (14.0 - x̄, 14.0 - ȳ)</i> clamped to <i style="font-family: serif;">[-4, 4]</i> pixels. Normalizes float32 intensities to <i style="font-family: serif;">[0.0, 1.0]</i>.</li>
+</ol>
+<hr />
+<!-- ========================================================================== -->
+<!-- SRS PAGE 2: FUNCTIONAL, INTERFACE, AND NON-FUNCTIONAL REQUIREMENTS         -->
+<!-- ========================================================================== -->
+            </div>
+            <div class="page-footer">
+                <span>System Engineering &amp; ML Architecture Specification</span>
+                <span>Page 1 of 2</span>
+            </div>
+        </div>
+        
+        <div class="page" id="srs-page-2">
+            <div class="page-header">
+                <span>Software Requirements Specification (SRS) &bull; IEEE Std 830-1998</span>
+                <span>Baseline v1.0.0</span>
+            </div>
+            <div class="page-content">
+                <h1 class="page-title">FUNCTIONAL, INTERFACE, AND NON-FUNCTIONAL REQUIREMENTS</h1>
+                <h3>4. Functional Requirements Specifications</h3>
+<div class="diagram-card"><div class="diagram-row"><div class="diagram-node">User</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">FR1 & FR2 & FR3 & FR4 & FR5 & FR6 & FR7 & FR8</div></div></div>
+<ul>
+<li><strong>FR-1: Multi-Modal Canvas:</strong> The system shall support mouse, touch, and stylus input on a <i style="font-family: serif;">280 × 280\text{px}</i> canvas, scaling client coordinates accurately while applying <code>touch-action: none</code> to block scrolling. It shall support Brush and Eraser tools (4px–32px), multi-step Undo/Redo, and keyboard shortcuts (<code>Ctrl+Z</code>, <code>Ctrl+Y</code>, <code>C</code>, <code>P</code>, <code>B</code>, <code>E</code>).</li>
+<li><strong>FR-2: Smart &amp; Auto Prediction:</strong> The system shall support on-demand inference and an optional ~700ms debounced auto-predict mode triggered after stroke completion. Repeated blank submissions shall be rejected with <code>HTTP 400</code>.</li>
+<li><strong>FR-3: Probability Visualization:</strong> The system shall display the predicted digit, confidence percentage, top 3 candidates, and a full 10-class horizontal bar chart rendered via Chart.js highlighting the winning digit.</li>
+<li><strong>FR-4: Preprocessing Inspector:</strong> The system shall provide an expandable inspection card illustrating original input, polarity-corrected grayscale, and final <i style="font-family: serif;">28 × 28</i> centered tensor image.</li>
+<li><strong>FR-5: History Persistence (SQLite):</strong> All predictions shall persist across page reloads and server restarts in SQLite (<code>history.db</code>). The UI shall provide real-time search, filtering by digit (<i style="font-family: serif;">0</i>–<i style="font-family: serif;">9</i>) and modality (<em>Canvas</em>, <em>Upload</em>, <em>Sample</em>), sorting by date and confidence, and single/bulk deletion.</li>
+<li><strong>FR-6: Safe CSV Export:</strong> The system shall export historical records via <code>GET /api/history/export</code> with UTF-8 BOM encoding and prefix sanitization (<code>'</code>) for cells starting with <code>=</code>, <code>+</code>, <code>-</code>, <code>@</code>, <code>\t</code>, or <code>\r</code>.</li>
+<li><strong>FR-7: Verification Feedback Loop:</strong> Users shall be able to mark predictions as &quot;Correct&quot; or &quot;Incorrect&quot; (with ground-truth actual digit selection), recorded in SQLite to track observed accuracy via <code>GET /api/feedback/stats</code>.</li>
+<li><strong>FR-8: Digit Challenge Mode:</strong> The system shall generate a random target digit (<i style="font-family: serif;">0</i>–<i style="font-family: serif;">9</i>) and update a persistent player scoreboard (+10 pts per match, total attempts, running accuracy).</li>
+</ul>
+<hr />
+<h3>5. External Interface &amp; REST API Specifications</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Method</th>
+<th style="text-align:left">Endpoint</th>
+<th style="text-align:left">Input Payload / Parameters</th>
+<th style="text-align:left">Success Output (JSON / Media)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>GET</code></td>
+<td style="text-align:left"><code>/</code></td>
+<td style="text-align:left">None</td>
+<td style="text-align:left"><code>200 OK</code> (Renders <code>index.html</code> single-page application)</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>GET</code></td>
+<td style="text-align:left"><code>/model-info</code></td>
+<td style="text-align:left">None</td>
+<td style="text-align:left"><code>200 OK</code> (Renders <code>model_info.html</code> architectural report)</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>GET</code></td>
+<td style="text-align:left"><code>/health</code></td>
+<td style="text-align:left">None</td>
+<td style="text-align:left"><code>{&quot;status&quot;: &quot;ok&quot;, &quot;model_loaded&quot;: true, &quot;version&quot;: &quot;1.0.0&quot;}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>POST</code></td>
+<td style="text-align:left"><code>/predict</code></td>
+<td style="text-align:left">Multipart file (<code>file</code>) OR JSON <code>{&quot;image&quot;: &quot;data:image/png;base64,...&quot;}</code></td>
+<td style="text-align:left"><code>{&quot;success&quot;: true, &quot;predicted_digit&quot;: int, &quot;confidence&quot;: float, &quot;probabilities&quot;: dict, &quot;top_three&quot;: list, &quot;preprocessing&quot;: dict, &quot;prediction_id&quot;: str}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>GET</code></td>
+<td style="text-align:left"><code>/api/history</code></td>
+<td style="text-align:left">Query params: <code>search</code>, <code>digit</code>, <code>input_type</code>, <code>sort_by</code>, <code>sort_order</code></td>
+<td style="text-align:left"><code>{&quot;success&quot;: true, &quot;history&quot;: list, &quot;total&quot;: int}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>DELETE</code></td>
+<td style="text-align:left"><code>/api/history/&lt;id&gt;</code></td>
+<td style="text-align:left">Record ID in URL</td>
+<td style="text-align:left"><code>{&quot;success&quot;: true, &quot;message&quot;: &quot;Record deleted&quot;}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>DELETE</code></td>
+<td style="text-align:left"><code>/api/history</code></td>
+<td style="text-align:left">None</td>
+<td style="text-align:left"><code>{&quot;success&quot;: true, &quot;message&quot;: &quot;All history cleared&quot;}</code></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>GET</code></td>
+<td style="text-align:left"><code>/api/history/export</code></td>
+<td style="text-align:left">None</td>
+<td style="text-align:left"><code>200 OK</code> (<code>Content-Type: text/csv; charset=utf-8</code>, attachment)</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>POST</code></td>
+<td style="text-align:left"><code>/api/feedback</code></td>
+<td style="text-align:left">`{&quot;prediction_id&quot;: str, &quot;feedback&quot;: &quot;correct&quot;</td>
+<td style="text-align:left">&quot;incorrect&quot;, &quot;actual_digit&quot;: int}`</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>GET</code></td>
+<td style="text-align:left"><code>/api/feedback/stats</code></td>
+<td style="text-align:left">None</td>
+<td style="text-align:left"><code>{&quot;success&quot;: true, &quot;stats&quot;: {&quot;total_predictions&quot;: int, &quot;total_feedback&quot;: int, &quot;observed_accuracy&quot;: float}}</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3>6. Non-Functional &amp; Operational Requirements (NFR)</h3>
+<ul>
+<li><strong>NFR-1: Latency &amp; Performance:</strong> Model inference execution shall complete within <i style="font-family: serif;">≤ 30\text{ms}</i> on standard CPU hardware. Total end-to-end HTTP request-response round-trip shall remain under <i style="font-family: serif;">100\text{ms}</i>.</li>
+<li><strong>NFR-2: Security &amp; Integrity:</strong> Incoming file uploads are capped at <i style="font-family: serif;">2\text{MB}</i>. File processing executes entirely in memory (<code>io.BytesIO</code>) without temporary disk artifact creation. CSV export enforces formula-injection neutralization.</li>
+<li><strong>NFR-3: Quality Assurance &amp; Automated Testing:</strong> The system shall maintain <strong>100% pass rate across 75 automated Pytest tests</strong> covering API routes, edge-case rejection, image preprocessing, and SQLite persistence.</li>
+<li><strong>NFR-4: Accessibility &amp; Cross-Device Usability:</strong> Compliant with WCAG 2.1 Level AA standards. All interactive canvas, buttons, and gallery cards feature explicit <code>:focus-visible</code> outlines, ARIA roles, and keyboard navigation. Includes persistent Light/Dark themes.</li>
+</ul>
+<hr />
+<h3>7. Verification Traceability Matrix &amp; Sign-Off</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Requirement ID</th>
+<th style="text-align:center">Verification Method</th>
+<th style="text-align:center">Associated Automated Test Suite</th>
+<th style="text-align:center">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><strong>FR-1</strong> (Canvas)</td>
+<td style="text-align:center">End-to-End &amp; DOM Inspection</td>
+<td style="text-align:center"><code>tests/test_canvas.py</code> (5 tests)</td>
+<td style="text-align:center"><strong>VERIFIED</strong></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>FR-2</strong> (Prediction)</td>
+<td style="text-align:center">Unit &amp; Boundary Testing</td>
+<td style="text-align:center"><code>tests/test_app.py</code>, <code>tests/test_preprocessing.py</code> (35 tests)</td>
+<td style="text-align:center"><strong>VERIFIED</strong></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>FR-3</strong> (Probabilities)</td>
+<td style="text-align:center">Integration Testing</td>
+<td style="text-align:center"><code>tests/test_enhanced_results.py</code> (4 tests)</td>
+<td style="text-align:center"><strong>VERIFIED</strong></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>FR-4</strong> (Preprocessing)</td>
+<td style="text-align:center">Preprocessing Transformation</td>
+<td style="text-align:center"><code>tests/test_preprocessing_visualization.py</code> (4 tests)</td>
+<td style="text-align:center"><strong>VERIFIED</strong></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>FR-5</strong> (SQLite History)</td>
+<td style="text-align:center">DB Transaction Tests</td>
+<td style="text-align:center"><code>tests/test_database_api.py</code>, <code>tests/test_history.py</code> (10 tests)</td>
+<td style="text-align:center"><strong>VERIFIED</strong></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>FR-6</strong> (CSV Export)</td>
+<td style="text-align:center">CSV Escaping &amp; Injection Simulation</td>
+<td style="text-align:center"><code>tests/test_csv_export.py</code> (3 tests)</td>
+<td style="text-align:center"><strong>VERIFIED</strong></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>FR-7</strong> (Feedback API)</td>
+<td style="text-align:center">API Integration Tests</td>
+<td style="text-align:center"><code>tests/test_database_api.py</code> (Feedback test)</td>
+<td style="text-align:center"><strong>VERIFIED</strong></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>FR-8</strong> (Challenge)</td>
+<td style="text-align:center">DOM &amp; UI Verification</td>
+<td style="text-align:center"><code>tests/test_app.py</code> (DOM tests)</td>
+<td style="text-align:center"><strong>VERIFIED</strong></td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>ML-1</strong> (CNN Model)</td>
+<td style="text-align:center">Tensor Shape &amp; Weight Inspection</td>
+<td style="text-align:center"><code>tests/test_model.py</code>, <code>tests/test_model_info.py</code> (6 tests)</td>
+<td style="text-align:center"><strong>VERIFIED</strong></td>
+</tr>
+</tbody>
+</table>
+<pre><code>========================================================================================
+                          END OF SOFTWARE REQUIREMENTS SPECIFICATION
+========================================================================================
+</code></pre>
+
+            </div>
+            <div class="page-footer">
+                <span>System Engineering &amp; ML Architecture Specification</span>
+                <span>Page 2 of 2</span>
+            </div>
+        </div>
+        
+</body>
+</html>

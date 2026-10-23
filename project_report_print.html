@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Handwritten Digit Recognition — Project Report</title>
+    <style>
+        
+@page {
+    size: A4 portrait;
+    margin: 12mm 14mm 12mm 14mm;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #1e293b;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+    font-size: 8.5pt;
+    line-height: 1.4;
+}
+
+.page {
+    page-break-after: always;
+    break-after: page;
+    height: 270mm;
+    max-height: 270mm;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    padding: 2mm 0;
+}
+
+.page:last-child {
+    page-break-after: auto;
+    break-after: auto;
+}
+
+.page-header {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1.5px solid #0284c7;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+    font-size: 7.5pt;
+    font-weight: 600;
+    color: #0369a1;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.page-footer {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #cbd5e1;
+    padding-top: 4px;
+    margin-top: 6px;
+    font-size: 7.5pt;
+    color: #64748b;
+}
+
+.page-content {
+    flex: 1 1 auto;
+    overflow: hidden;
+}
+
+h1.page-title {
+    font-size: 13pt;
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 2px solid #2563eb;
+    padding-bottom: 3px;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.3px;
+}
+
+h2 {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin: 8px 0 4px 0;
+    border-left: 3px solid #3b82f6;
+    padding-left: 6px;
+}
+
+h3 {
+    font-size: 9pt;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 6px 0 3px 0;
+}
+
+p {
+    margin: 0 0 5px 0;
+    color: #334155;
+    text-align: justify;
+}
+
+ul, ol {
+    margin: 0 0 6px 0;
+    padding-left: 18px;
+}
+
+li {
+    margin-bottom: 2px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 6px 0 8px 0;
+    font-size: 7.8pt;
+}
+
+th {
+    background: #1e40af;
+    color: #ffffff;
+    font-weight: 600;
+    padding: 4px 6px;
+    text-align: left;
+    border: 1px solid #1e3a8a;
+}
+
+td {
+    padding: 3.5px 6px;
+    border: 1px solid #cbd5e1;
+    color: #1e293b;
+}
+
+tr:nth-child(even) td {
+    background-color: #f8fafc;
+}
+
+pre {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-family: Consolas, "Liberation Mono", Courier, monospace;
+    font-size: 7.5pt;
+    line-height: 1.25;
+    margin: 4px 0 6px 0;
+    overflow: hidden;
+    white-space: pre-wrap;
+}
+
+code {
+    font-family: Consolas, "Liberation Mono", Courier, monospace;
+    font-size: 8pt;
+    background: #e2e8f0;
+    color: #0f172a;
+    padding: 1px 3px;
+    border-radius: 3px;
+}
+
+.math-display {
+    background: #f1f5f9;
+    border-left: 3px solid #6366f1;
+    padding: 4px 8px;
+    margin: 4px 0 6px 0;
+    font-family: "Cambria Math", "Times New Roman", serif;
+    font-size: 8.8pt;
+    color: #1e1b4b;
+    font-style: italic;
+}
+
+.cover-card {
+    border: 2px solid #1e3a8a;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    margin: 10px 0 16px 0;
+}
+
+.cover-title {
+    font-size: 16pt;
+    font-weight: 800;
+    color: #1e3a8a;
+    margin-bottom: 8px;
+    line-height: 1.2;
+}
+
+.cover-subtitle {
+    font-size: 10pt;
+    font-weight: 600;
+    color: #0369a1;
+    margin-bottom: 12px;
+}
+
+.cover-meta {
+    font-size: 8pt;
+    color: #475569;
+    margin: 3px 0;
+}
+
+.diagram-card {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin: 6px 0;
+    font-family: Consolas, monospace;
+    font-size: 7.5pt;
+}
+
+.diagram-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 4px 0;
+    flex-wrap: wrap;
+}
+
+.diagram-node {
+    background: #ffffff;
+    border: 1.5px solid #2563eb;
+    border-radius: 4px;
+    padding: 4px 6px;
+    text-align: center;
+    font-weight: 600;
+    color: #1e40af;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.diagram-node.dark {
+    background: #1e40af;
+    color: #ffffff;
+    border-color: #1e3a8a;
+}
+
+.diagram-arrow {
+    color: #64748b;
+    font-weight: bold;
+    font-size: 10pt;
+}
+
+.badge {
+    display: inline-block;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 7pt;
+    font-weight: 600;
+}
+.badge-blue { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+.badge-green { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+.badge-orange { background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; }
+
+.highlight-box {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-left: 3px solid #2563eb;
+    padding: 6px 10px;
+    border-radius: 4px;
+    margin: 6px 0;
+    font-size: 8pt;
+}
+
+    </style>
+</head>
+<body>
+    
+        <div class="page" id="report-page-1">
+            <div class="page-header">
+                <span>Handwritten Digit Recognition System &bull; Technical Capstone Report</span>
+                <span>Section 1 &bull; Phase 16</span>
+            </div>
+            <div class="page-content">
+                <h1 class="page-title">TITLE PAGE & EXECUTIVE SUMMARY</h1>
+                <br>
+<pre><code>========================================================================================
+                      DEPARTMENT OF COMPUTER SCIENCE &amp; ENGINEERING
+                   CAPSTONE ENGINEERING PROJECT TECHNICAL REPORT
+========================================================================================
+
+                               PROJECT TITLE:
+             HANDWRITTEN DIGIT RECOGNITION AND CLASSIFICATION SYSTEM
+             USING DEEP CONVOLUTIONAL NEURAL NETWORKS AND FLASK REST APIS
+
+                     PROJECT REPOSITORY &amp; WORKING DIRECTORY:
+                     D:\RealTimeWork\Handwritten Digit Recognition
+========================================================================================
+</code></pre>
+<h3>Executive Summary</h3>
+<p>Handwritten digit recognition serves as a foundational benchmark in computer vision, pattern recognition, and optical character recognition (OCR). The primary objective of this project was to design, implement, train, evaluate, and deploy an industrial-grade, end-to-end deep learning web application capable of recognizing single handwritten numerical digits (0 through 9) in real time.</p>
+<p>The core predictive engine is powered by an optimized Convolutional Neural Network (CNN) trained on the 70,000-image Modified National Institute of Standards and Technology (MNIST) dataset. Achieving an outstanding <strong>99.10% classification accuracy</strong> and an empirical test loss of <strong>0.0262</strong> across 10,000 unseen test samples, the trained model demonstrates state-of-the-art generalization while maintaining a compact footprint of <strong>225,034 trainable parameters</strong>.</p>
+<p>Beyond the machine learning backbone, the project delivers a production-grade, highly responsive web dashboard engineered using Python Flask, HTML5 Canvas with high-DPI scaling, CSS3, JavaScript ES6+, Bootstrap 5, and Chart.js. The application integrates:</p>
+<ol>
+<li>An interactive, multi-modal drawing canvas supporting mouse, touch, and stylus input with dual-state undo/redo, variable brush sizing, an eraser tool, and a 700ms debounced auto-predict engine.</li>
+<li>A robust, 6-stage computer vision preprocessing pipeline incorporating aspect-ratio preserving bounding-box resizing, automated polarity detection, and Center-of-Mass (CoM) centroid translation.</li>
+<li>Persistent history storage built on an acid-compliant SQLite database with search, multi-factor filtering, individual record deletion, and formula-injection-safe CSV export.</li>
+<li>An active learning verification feedback loop allowing human-in-the-loop accuracy tracking.</li>
+<li>An interactive &quot;Digit Challenge&quot; gamification mode, comprehensive model analytics with a full <i style="font-family: serif;">10 × 10</i> confusion matrix, and full WCAG accessibility compliance.</li>
+</ol>
+<p>The system is validated through an automated suite of <strong>75 unit, regression, and end-to-end integration tests</strong> executed via Pytest, confirming 100% operational reliability.</p>
+<hr />
+<!-- ========================================================================== -->
+<!-- PAGE 2: TABLE OF CONTENTS & DOCUMENT PRELIMINARIES                         -->
+<!-- ========================================================================== -->
+            </div>
+            <div class="page-footer">
+                <span>Department of Computer Science &amp; Engineering</span>
+                <span>Page 1 of 13</span>
+            </div>
+        </div>
+        
+        <div class="page" id="report-page-2">
+            <div class="page-header">
+                <span>Handwritten Digit Recognition System &bull; Technical Capstone Report</span>
+                <span>Section 2 &bull; Phase 16</span>
+            </div>
+            <div class="page-content">
+                <h1 class="page-title">TABLE OF CONTENTS & DOCUMENT PRELIMINARIES</h1>
+                <h3>Table of Contents</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Page / Chapter</th>
+<th style="text-align:left">Section Title</th>
+<th style="text-align:left">Primary Focus &amp; Domain</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Page 1</strong></td>
+<td style="text-align:left">Title Page &amp; Executive Summary</td>
+<td style="text-align:left">Formal metadata, abstract, and project summary</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Page 2</strong></td>
+<td style="text-align:left">Table of Contents &amp; Preliminaries</td>
+<td style="text-align:left">Navigation, list of figures, tables, and conventions</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Page 3</strong></td>
+<td style="text-align:left">Chapter 1: Introduction &amp; Problem Statement</td>
+<td style="text-align:left">Background, challenges, motivation, and project scope</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Page 4</strong></td>
+<td style="text-align:left">Chapter 2: Theoretical Foundations &amp; Literature</td>
+<td style="text-align:left">CNN mathematical foundations, convolutions, activation</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Page 5</strong></td>
+<td style="text-align:left">Chapter 3: System Requirements &amp; Architecture</td>
+<td style="text-align:left">Hardware/Software specifications, 3-tier system design</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Page 6</strong></td>
+<td style="text-align:left">Chapter 4: Data Engineering &amp; Preprocessing</td>
+<td style="text-align:left">6-stage image pipeline, polarity inversion, center of mass</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Page 7</strong></td>
+<td style="text-align:left">Chapter 5: CNN Architecture &amp; Training Pipeline</td>
+<td style="text-align:left">Layer derivation, 225,034 parameters, Adam optimization</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Page 8</strong></td>
+<td style="text-align:left">Chapter 6: Backend REST API &amp; Persistence Engine</td>
+<td style="text-align:left">Flask routing, SQLite schema, CSV injection safety</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Page 9</strong></td>
+<td style="text-align:left">Chapter 7: Frontend Engineering &amp; Interactive Canvas</td>
+<td style="text-align:left">HTML5 Canvas, touch event scaling, Chart.js, Gamification</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Page 10</strong></td>
+<td style="text-align:left">Chapter 8: Quality Assurance &amp; Verification Testing</td>
+<td style="text-align:left">75 Pytest suite breakdown, edge cases, regression coverage</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Page 11</strong></td>
+<td style="text-align:left">Chapter 9: Experimental Results &amp; Model Evaluation</td>
+<td style="text-align:left">99.10% accuracy, 10x10 confusion matrix, per-class metrics</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Page 12</strong></td>
+<td style="text-align:left">Chapter 10: User Manual &amp; Production Deployment</td>
+<td style="text-align:left">Execution guide, API reference, operational troubleshooting</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Page 13</strong></td>
+<td style="text-align:left">Chapter 11: Conclusion, Limitations &amp; Future Scope</td>
+<td style="text-align:left">Project retrospective, real-world constraints, references</td>
+</tr>
+</tbody>
+</table>
+<h3>List of Figures &amp; Tables</h3>
+<ul>
+<li><strong>Figure 1.1:</strong> Conceptual Multi-Tier System Architecture (Mermaid Diagram)</li>
+<li><strong>Figure 4.1:</strong> Image Preprocessing &amp; Normalization Dataflow</li>
+<li><strong>Figure 5.1:</strong> Deep CNN Layer Topology and Feature Dimension Progression</li>
+<li><strong>Table 3.1:</strong> Technology Stack and Minimum Operational Dependencies</li>
+<li><strong>Table 5.1:</strong> Detailed Model Layer Architecture and Parameter Breakdown</li>
+<li><strong>Table 6.1:</strong> SQLite Relational Database Table Schemas (<code>predictions</code> &amp; <code>feedback</code>)</li>
+<li><strong>Table 8.1:</strong> Automated Pytest Test Suite Module Distribution (75 Tests)</li>
+<li><strong>Table 9.1:</strong> Per-Class Precision, Recall, F1-Score, and Support Distribution</li>
+<li><strong>Table 9.2:</strong> <i style="font-family: serif;">10 × 10</i> Empirical Confusion Matrix for the 10,000-sample MNIST Test Set</li>
+</ul>
+<h3>Notation &amp; Mathematical Conventions</h3>
+<ul>
+<li>Scalar values: <i style="font-family: serif;">x, y ∈ ℝ</i></li>
+<li>Image tensors: <i style="font-family: serif;">\mathbf{X} ∈ ℝ^{H × W × C}</i>, specifically <i style="font-family: serif;">28 × 28 × 1</i></li>
+<li>Convolution kernel: <i style="font-family: serif;">\mathbf{K} ∈ ℝ^{k_h × k_w}</i></li>
+<li>Softmax probability distribution: <i style="font-family: serif;">\mathbf{p} = [p_0, p_1, \dots, p_9]^→p</i> such that <i style="font-family: serif;">\sum_{i=0}^{9} p_i = 1</i></li>
+</ul>
+<hr />
+<!-- ========================================================================== -->
+<!-- PAGE 3: CHAPTER 1 - INTRODUCTION & PROBLEM STATEMENT                       -->
+<!-- ========================================================================== -->
+            </div>
+            <div class="page-footer">
+                <span>Department of Computer Science &amp; Engineering</span>
+                <span>Page 2 of 13</span>
+            </div>
+        </div>
+        
+        <div class="page" id="report-page-3">
+            <div class="page-header">
+                <span>Handwritten Digit Recognition System &bull; Technical Capstone Report</span>
+                <span>Section 3 &bull; Phase 16</span>
+            </div>
+            <div class="page-content">
+                <h1 class="page-title">CHAPTER 1: INTRODUCTION & PROBLEM STATEMENT</h1>
+                <h3>1.1 Background and Motivation</h3>
+<p>The automation of document processing, postal sorting, bank check verification, and digitized forms processing relies fundamentally on Optical Character Recognition (OCR) systems. Among the various subproblems within OCR, isolated handwritten digit recognition represents an essential baseline. Unlike typed or printed typography, handwritten script exhibits high degrees of inter-personal variation, including differences in stroke width, slant, curvature, loop closure, aspect ratio, and spatial position.</p>
+<p>With the advent of deep representation learning, Convolutional Neural Networks (CNNs) have established clear superiority over traditional feature extraction pipelines (such as Histogram of Oriented Gradients (HOG) or Scale-Invariant Feature Transform (SIFT) paired with Support Vector Machines). CNNs autonomously learn spatial feature hierarchies directly from raw pixel intensity values.</p>
+<h3>1.2 Problem Statement</h3>
+<p>While high-accuracy classification models can be trained within isolated research notebooks, deploying these models into interactive, end-user web environments introduces significant engineering challenges:</p>
+<ol>
+<li><strong>Preprocessing Domain Shift:</strong> Freehand digits drawn on arbitrary web canvases or uploaded via consumer camera smartphones differ markedly in resolution, background color, stroke thickness, and alignment from the standardized MNIST distribution (which consists of centered, <i style="font-family: serif;">28 × 28</i> grayscale digits on a solid black background).</li>
+<li><strong>Real-Time Responsiveness:</strong> The system must process inputs, run image transformations, perform tensor inferencing, and transmit probability distributions back to the client with sub-100 millisecond latency.</li>
+<li><strong>Session Persistence and Human Verification:</strong> Users require the ability to review past inferences, filter and export historical sessions, and provide corrective feedback when the model misclassifies ambiguous handwriting.</li>
+<li><strong>Resilience to Adversarial &amp; Malformed Inputs:</strong> The web service must handle corrupt files, blank canvases, reversed contrast polarities (dark ink on white paper vs. white ink on dark paper), and arbitrary dimensions without server crashes or unhandled exceptions.</li>
+</ol>
+<div class="diagram-card"><div class="diagram-row"><div class="diagram-node">ARaw User Input - Canvas / Upload / Gallery</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">BPre-processing Pipeline - Centering, Inversion, 28x28</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">B</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">CTensorFlow CNN Engine - Inference & Probabilities</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">C</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">DSQLite Database - Persistence & Feedback</div></div></div>
+*Figure 1.1: High-Level System Architecture and Inference Pipeline.*
+<h3>1.3 Project Objectives and Scope</h3>
+<p>To address these challenges, this project established the following explicit design goals:</p>
+<ul>
+<li><strong>Model Development:</strong> Train a deep CNN yielding <i style="font-family: serif;">&gt;98.5%</i> test accuracy on the MNIST benchmark with minimal memory overhead.</li>
+<li><strong>Robust Preprocessing Module:</strong> Implement an adaptive, production-safe preprocessing pipeline that handles contrast detection, aspect-ratio preservation, noise elimination, and Center-of-Mass alignment.</li>
+<li><strong>Modern Full-Stack Dashboard:</strong> Provide an accessible, responsive UI with multi-input options (Canvas, File Upload, Sample Gallery, Challenge Game).</li>
+<li><strong>Persistence &amp; Auditability:</strong> Develop an ACID-compliant database architecture with query capabilities and formula-safe CSV export.</li>
+<li><strong>Exhaustive Testing:</strong> Enforce strict quality assurance with automated test coverage across edge cases, API endpoints, and model predictions.</li>
+</ul>
+<hr />
+<!-- ========================================================================== -->
+<!-- PAGE 4: CHAPTER 2 - THEORETICAL FOUNDATIONS & LITERATURE REVIEW            -->
+<!-- ========================================================================== -->
+            </div>
+            <div class="page-footer">
+                <span>Department of Computer Science &amp; Engineering</span>
+                <span>Page 3 of 13</span>
+            </div>
+        </div>
+        
+        <div class="page" id="report-page-4">
+            <div class="page-header">
+                <span>Handwritten Digit Recognition System &bull; Technical Capstone Report</span>
+                <span>Section 4 &bull; Phase 16</span>
+            </div>
+            <div class="page-content">
+                <h1 class="page-title">CHAPTER 2: THEORETICAL FOUNDATIONS & LITERATURE REVIEW</h1>
+                <h3>2.1 The MNIST Benchmark</h3>
+<p>The Modified National Institute of Standards and Technology (MNIST) dataset, compiled by Yann LeCun, Corinna Cortes, and Christopher J.C. Burges, remains the definitive benchmark in pattern recognition. Extracted from Special Database 3 and Special Database 1 (comprising high-school students and US Census Bureau employees), MNIST contains 60,000 training patterns and 10,000 testing patterns. Every sample is an anti-aliased, 8-bit grayscale image normalized into a <i style="font-family: serif;">20 × 20</i> pixel bounding box and positioned centrally within a <i style="font-family: serif;">28 × 28</i> field by calculating its center of mass.</p>
+<h3>2.2 Convolutional Neural Network (CNN) Mechanics</h3>
+<p>Unlike traditional Multi-Layer Perceptrons (MLPs) which flatten 2D spatial matrices into 1D vectors—thereby discarding spatial correlation—CNNs preserve local 2D spatial structures through three primary mechanisms:</p>
+<h4>1. Discrete 2D Convolution Operation</h4>
+<p>The convolution of an input feature map <i style="font-family: serif;">\mathbf{I}</i> with a learned filter kernel <i style="font-family: serif;">\mathbf{K} ∈ ℝ^{k × k}</i> is defined discretely as:</p>
+<div class="math-display">S(i, j) = (<b>I</b> * <b>K</b>)(i, j) = &sum;_(m) &sum;_(n) <b>I</b>(i - m, j - n) <b>K</b>(m, n) + b</div>
+Where <i style="font-family: serif;">b</i> represents the scalar bias parameter. Convolutions exploit *parameter sharing* (the same kernel applies across the entire receptive field) and *sparse connectivity* (each neuron connects only to a small localized sub-region of the input).
+<h4>2. Rectified Linear Activation (ReLU)</h4>
+<p>To introduce non-linear mapping capabilities necessary for complex boundary separation without suffering from vanishing gradients during backpropagation, the Rectified Linear Unit activation function is applied element-wise:</p>
+<div class="math-display">f(x) = max(0, x)</div>
+<h4>3. Spatial Downsampling via Max-Pooling</h4>
+<p>MaxPooling operations extract the maximum activation value across non-overlapping <i style="font-family: serif;">2 × 2</i> windows:</p>
+<div class="math-display">P(i, j) = max_(0 &le; m, n < 2) S(2i + m, 2j + n)</div>
+This halving of spatial dimensions grants translation invariance, reduces downstream parameter count, and broadens the effective receptive field of subsequent deeper layers.
+<h4>4. Categorical Softmax Normalization</h4>
+<p>In the terminal classification layer, raw network logit outputs <i style="font-family: serif;">z_k</i> (where <i style="font-family: serif;">k ∈ {0, 1, \dots, 9}</i>) are normalized into a calibrated probability distribution using the Softmax function:</p>
+<div class="math-display">&sigma;(<b>z</b>)_k = (e^(z_k))(&sum;_(j=0)^(9) e^(z_j)), \quad (such that ) &sum;_(k=0)^(9) &sigma;(<b>z</b>)_k = 1.0</div>
+<h3>2.3 Regularization and Optimization Strategies</h3>
+<ul>
+<li><strong>Dropout Regularization:</strong> During backpropagation training, random subsets of activations are temporarily set to zero with probability <i style="font-family: serif;">p</i> (e.g., <i style="font-family: serif;">p=0.25</i> in convolutional stages, <i style="font-family: serif;">p=0.5</i> in dense stages). This prevents co-adaptation of features and forces the network to learn redundant, robust feature representations.</li>
+<li><strong>Adam (Adaptive Moment Estimation):</strong> Combines the advantages of AdaGrad (handling sparse gradients) and RMSProp (handling non-stationary objectives) by tracking exponentially decaying averages of past gradients (<i style="font-family: serif;">m_t</i>) and squared gradients (<i style="font-family: serif;">v_t</i>):</li>
+</ul>
+<div class="math-display">m_t = &beta;_1 m_(t-1) + (1 - &beta;_1) g_t, \quad v_t = &beta;_2 v_(t-1) + (1 - &beta;_2) g_t^2</div>
+<hr />
+<!-- ========================================================================== -->
+<!-- PAGE 5: CHAPTER 3 - SYSTEM REQUIREMENTS & ARCHITECTURAL SPECIFICATIONS    -->
+<!-- ========================================================================== -->
+            </div>
+            <div class="page-footer">
+                <span>Department of Computer Science &amp; Engineering</span>
+                <span>Page 4 of 13</span>
+            </div>
+        </div>
+        
+        <div class="page" id="report-page-5">
+            <div class="page-header">
+                <span>Handwritten Digit Recognition System &bull; Technical Capstone Report</span>
+                <span>Section 5 &bull; Phase 16</span>
+            </div>
+            <div class="page-content">
+                <h1 class="page-title">CHAPTER 3: SYSTEM REQUIREMENTS & ARCHITECTURAL SPECIFICATIONS</h1>
+                <h3>3.1 Hardware and Software Environment Requirements</h3>
+<p>The system is designed for deployment across low-resource host environments, local developer machines, or enterprise cloud containers without specialized GPU hardware requirements.</p>
+<p><em>Table 3.1: Complete Technology Stack and System Environment Specifications.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Category</th>
+<th style="text-align:left">Component / Tool</th>
+<th style="text-align:left">Version</th>
+<th style="text-align:left">Purpose / Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Runtime Environment</strong></td>
+<td style="text-align:left">Python</td>
+<td style="text-align:left">3.12.10</td>
+<td style="text-align:left">Core backend language runtime</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Deep Learning Framework</strong></td>
+<td style="text-align:left">TensorFlow / Keras</td>
+<td style="text-align:left">2.18.0</td>
+<td style="text-align:left">CNN architecture definition, training, inference</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Numerical Processing</strong></td>
+<td style="text-align:left">NumPy</td>
+<td style="text-align:left"><i style="font-family: serif;">≥</i> 1.26.0</td>
+<td style="text-align:left">Tensor manipulation and numerical calculations</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Image Processing Engine</strong></td>
+<td style="text-align:left">Pillow (PIL)</td>
+<td style="text-align:left"><i style="font-family: serif;">≥</i> 10.0.0</td>
+<td style="text-align:left">Grayscale conversion, resampling, bounding boxes</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Web Server Framework</strong></td>
+<td style="text-align:left">Flask (Werkzeug)</td>
+<td style="text-align:left"><i style="font-family: serif;">≥</i> 3.0.0</td>
+<td style="text-align:left">RESTful HTTP routing, multipart decoding</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Database Engine</strong></td>
+<td style="text-align:left">SQLite 3</td>
+<td style="text-align:left">Embedded</td>
+<td style="text-align:left">Relational storage for history, audits, feedback</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Frontend UI Framework</strong></td>
+<td style="text-align:left">Bootstrap</td>
+<td style="text-align:left">5.3.3</td>
+<td style="text-align:left">Responsive grid, cards, modals, form controls</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Iconography</strong></td>
+<td style="text-align:left">Bootstrap Icons</td>
+<td style="text-align:left">1.11.3</td>
+<td style="text-align:left">Semantic vector icon set</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Visualization Engine</strong></td>
+<td style="text-align:left">Chart.js</td>
+<td style="text-align:left">4.4.2</td>
+<td style="text-align:left">Interactive probability bar chart rendering</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Automated Testing</strong></td>
+<td style="text-align:left">Pytest</td>
+<td style="text-align:left">9.1.1</td>
+<td style="text-align:left">Unit, integration, and regression test execution</td>
+</tr>
+</tbody>
+</table>
+<h3>3.2 High-Level Three-Tier Architecture</h3>
+<p>The system architecture follows a clean, decoupled three-tier architectural paradigm:</p>
+<div class="diagram-card"><div class="diagram-row"><div class="diagram-node">ClientTier <</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">|REST HTTP / JSON / Multipart| ServerTier</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">ServerTier <</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">DataTier</div></div></div>
+<h3>3.3 Security, Privacy &amp; Integrity Specifications</h3>
+<ul>
+<li><strong>Client-Side Limits:</strong> Restricts file uploads to 2 MB and validates MIME types before dispatch.</li>
+<li><strong>In-Memory Streaming:</strong> All incoming images are processed as in-memory byte streams via <code>io.BytesIO</code>. Temporary files are not stored on host disk platters, preventing disk bloat and disk-based file-inclusion vulnerabilities.</li>
+<li><strong>CSV Formula Injection Sanitization:</strong> Prediction exports sanitize sensitive trigger characters (<code>=</code>, <code>+</code>, <code>-</code>, <code>@</code>) to prevent remote command execution when opened in spreadsheet applications.</li>
+</ul>
+<hr />
+<!-- ========================================================================== -->
+<!-- PAGE 6: CHAPTER 4 - DATA ENGINEERING & PREPROCESSING PIPELINE              -->
+<!-- ========================================================================== -->
+            </div>
+            <div class="page-footer">
+                <span>Department of Computer Science &amp; Engineering</span>
+                <span>Page 5 of 13</span>
+            </div>
+        </div>
+        
+        <div class="page" id="report-page-6">
+            <div class="page-header">
+                <span>Handwritten Digit Recognition System &bull; Technical Capstone Report</span>
+                <span>Section 6 &bull; Phase 16</span>
+            </div>
+            <div class="page-content">
+                <h1 class="page-title">CHAPTER 4: DATA ENGINEERING & PREPROCESSING PIPELINE</h1>
+                <h3>4.1 The Image Domain Discrepancy Problem</h3>
+<p>MNIST images are standardized into <i style="font-family: serif;">28 × 28</i> grayscale matrices where the digit strokes are represented by high pixel values (<i style="font-family: serif;">0 → 255</i>, white ink) centered against a uniform pitch-black background (<i style="font-family: serif;">0</i>, black paper). Conversely, real-world user inputs typically consist of dark pen/pencil marks on white paper, or arbitrary canvas sizes (e.g., <i style="font-family: serif;">280 × 280</i> or <i style="font-family: serif;">400 × 400</i> px) with varied stroke weights. Passing raw user inputs directly into a CNN results in near-zero recognition accuracy.</p>
+<h3>4.2 The 6-Stage Preprocessing Architecture</h3>
+<p>To bridge this domain discrepancy, the system implements a deterministic, multi-stage image processing algorithm in [<code>image_processing.py</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/image_processing.py):</p>
+<div class="diagram-card"><div class="diagram-row"><div class="diagram-node">S11. Stream Decoding & Format Check - Validates PNG/JPEG, <2MB</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">S22. Grayscale & Alpha Flattening - Convert RGBA/RGB to 8-bit L</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">S2</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">S33. Background Polarity Normalization - Border Pixel Mean Analysis & Inversion</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">S3</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">S44. Bounding Box Cropping & Blank Check - Thresholding at T=30, Reject Noise</div></div></div>
+*Figure 4.1: Six-Stage Preprocessing Sequence.*
+<h3>4.3 Detailed Mathematical Steps</h3>
+<h4>Step 1: Alpha Flattening &amp; Grayscale Conversion</h4>
+<p>Transparent PNGs from canvas drawings contain alpha channels. We composite them against an opaque background and project into single-channel luminance:</p>
+<div class="math-display">L = 0.299R + 0.587G + 0.114B</div>
+<h4>Step 2: Adaptive Polarity Detection &amp; Inversion</h4>
+<p>To identify whether the image is &quot;dark-on-light&quot; or &quot;light-on-dark&quot;, the algorithm samples the outer 1-pixel border perimeter <i style="font-family: serif;">B</i> of the image:</p>
+<div class="math-display">&mu;_((border)) = (1)(|B|) &sum;_((x,y) &isin; B) I(x, y)</div>
+If <i style="font-family: serif;">&mu;_{\text{border}} > 127.5</i>, the image is classified as dark-on-light (e.g., standard paper). The intensities are inverted: <i style="font-family: serif;">I_{\text{inv}}(x, y) = 255 - I(x, y)</i>. Otherwise, it is preserved as light-on-dark.
+<h4>Step 3: Bounding Box Detection and Noise Filtering</h4>
+<p>Foreground pixels are extracted by applying a threshold <i style="font-family: serif;">T = 30</i>:</p>
+<div class="math-display">F = \((x, y) \mid I(x, y) > 30\)</div>
+If <i style="font-family: serif;">|F| < 10</i> pixels or the dynamic range <i style="font-family: serif;">\max(I) - \min(I) < 15</i>, the image is rejected as a `BlankImageError`. Otherwise, the minimal bounding box <i style="font-family: serif;">[x_{\min}, y_{\min}, x_{\max}, y_{\max}]</i> is cropped.
+<h4>Step 4: Aspect-Ratio Preserving Resizing</h4>
+<p>The bounding box with dimensions <i style="font-family: serif;">(w, h)</i> is scaled to fit within a <i style="font-family: serif;">20 × 20</i> box preserving its aspect ratio:</p>
+<div class="math-display">s = (20)(max(w, h)), \quad w' = (round)(w &middot; s), \quad h' = (round)(h &middot; s)</div>
+Resampling is performed via high-quality `PIL.Image.Resampling.LANCZOS`.
+<h4>Step 5: Center-of-Mass (CoM) Centroid Alignment</h4>
+<p>The resized <i style="font-family: serif;">w' × h'</i> digit is initially pasted into the center of a blank <i style="font-family: serif;">28 × 28</i> canvas. The Center of Mass <i style="font-family: serif;">(x̄, ȳ)</i> of the pixel intensities is calculated:</p>
+<div class="math-display">\bar(x) = (&sum;_(x) &sum;_(y) x &middot; I(x, y))(&sum;_(x) &sum;_(y) I(x, y)), \quad \bar(y) = (&sum;_(x) &sum;_(y) y &middot; I(x, y))(&sum;_(x) &sum;_(y) I(x, y))</div>
+The image is then shifted by <i style="font-family: serif;">(&Delta; x, &Delta; y) = (14.0 - x&#772;, 14.0 - y&#772;)</i> with sub-pixel clamp limits <i style="font-family: serif;">[-4, 4]</i> to prevent cropping. This aligns the digit with the exact standard used in the original MNIST compilation.
+<hr />
+<!-- ========================================================================== -->
+<!-- PAGE 7: CHAPTER 5 - DEEP CNN ARCHITECTURE & TRAINING METHODOLOGY           -->
+<!-- ========================================================================== -->
+            </div>
+            <div class="page-footer">
+                <span>Department of Computer Science &amp; Engineering</span>
+                <span>Page 6 of 13</span>
+            </div>
+        </div>
+        
+        <div class="page" id="report-page-7">
+            <div class="page-header">
+                <span>Handwritten Digit Recognition System &bull; Technical Capstone Report</span>
+                <span>Section 7 &bull; Phase 16</span>
+            </div>
+            <div class="page-content">
+                <h1 class="page-title">CHAPTER 5: DEEP CNN ARCHITECTURE & TRAINING METHODOLOGY</h1>
+                <h3>5.1 Layer-by-Layer Architectural Specification</h3>
+<p>The convolutional network is constructed as a sequential topological graph using TensorFlow/Keras. It consists of two convolutional feature extraction blocks followed by a fully-connected dense classification head.</p>
+<div class="diagram-card"><div class="diagram-row"><div class="diagram-node">InputInput - 28x28x1</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">Conv1Conv2D 32, 3x3 - ReLU -> 26x26x32</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">Conv1</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">Pool1MaxPool 2x2 - 13x13x32</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">Pool1</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">Conv2Conv2D 64, 3x3 - ReLU -> 11x11x64</div></div></div>
+*Figure 5.1: Convolutional Neural Network Topology.*
+<h3>5.2 Mathematical Derivation of Trainable Parameters</h3>
+<p>Understanding the structural footprint and computational complexity requires exact parameter derivation for each layer:</p>
+<p><em>Table 5.1: Comprehensive Parameter Derivation by Layer.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Layer Name</th>
+<th style="text-align:left">Layer Type</th>
+<th style="text-align:left">Output Shape</th>
+<th style="text-align:left">Kernel / Receptive Field</th>
+<th style="text-align:left">Formula for Parameters</th>
+<th style="text-align:left">Param Count</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>digit_input</code></td>
+<td style="text-align:left">InputLayer</td>
+<td style="text-align:left"><i style="font-family: serif;">(28, 28, 1)</i></td>
+<td style="text-align:left">—</td>
+<td style="text-align:left">None</td>
+<td style="text-align:left">0</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>conv_1</code></td>
+<td style="text-align:left">Conv2D</td>
+<td style="text-align:left"><i style="font-family: serif;">(26, 26, 32)</i></td>
+<td style="text-align:left"><i style="font-family: serif;">3 × 3</i>, Stride 1, Valid</td>
+<td style="text-align:left"><i style="font-family: serif;">(3 × 3 × 1 + 1) × 32</i></td>
+<td style="text-align:left"><strong>320</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pool_1</code></td>
+<td style="text-align:left">MaxPooling2D</td>
+<td style="text-align:left"><i style="font-family: serif;">(13, 13, 32)</i></td>
+<td style="text-align:left"><i style="font-family: serif;">2 × 2</i>, Stride 2</td>
+<td style="text-align:left">None</td>
+<td style="text-align:left">0</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>conv_2</code></td>
+<td style="text-align:left">Conv2D</td>
+<td style="text-align:left"><i style="font-family: serif;">(11, 11, 64)</i></td>
+<td style="text-align:left"><i style="font-family: serif;">3 × 3</i>, Stride 1, Valid</td>
+<td style="text-align:left"><i style="font-family: serif;">(3 × 3 × 32 + 1) × 64</i></td>
+<td style="text-align:left"><strong>18,496</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>pool_2</code></td>
+<td style="text-align:left">MaxPooling2D</td>
+<td style="text-align:left"><i style="font-family: serif;">(5, 5, 64)</i></td>
+<td style="text-align:left"><i style="font-family: serif;">2 × 2</i>, Stride 2</td>
+<td style="text-align:left">None</td>
+<td style="text-align:left">0</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>dropout_conv</code></td>
+<td style="text-align:left">Dropout (<i style="font-family: serif;">p=0.25</i>)</td>
+<td style="text-align:left"><i style="font-family: serif;">(5, 5, 64)</i></td>
+<td style="text-align:left">—</td>
+<td style="text-align:left">None</td>
+<td style="text-align:left">0</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>flatten</code></td>
+<td style="text-align:left">Flatten</td>
+<td style="text-align:left"><i style="font-family: serif;">(1600)</i></td>
+<td style="text-align:left">Flatten: <i style="font-family: serif;">5 × 5 × 64</i></td>
+<td style="text-align:left">None</td>
+<td style="text-align:left">0</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>dense_hidden</code></td>
+<td style="text-align:left">Dense (ReLU)</td>
+<td style="text-align:left"><i style="font-family: serif;">(128)</i></td>
+<td style="text-align:left">Fully connected</td>
+<td style="text-align:left"><i style="font-family: serif;">(1600 + 1) × 128</i></td>
+<td style="text-align:left"><strong>204,928</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><code>dropout_dense</code></td>
+<td style="text-align:left">Dropout (<i style="font-family: serif;">p=0.50</i>)</td>
+<td style="text-align:left"><i style="font-family: serif;">(128)</i></td>
+<td style="text-align:left">—</td>
+<td style="text-align:left">None</td>
+<td style="text-align:left">0</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>digit_probs</code></td>
+<td style="text-align:left">Dense (Softmax)</td>
+<td style="text-align:left"><i style="font-family: serif;">(10)</i></td>
+<td style="text-align:left">10 output classes</td>
+<td style="text-align:left"><i style="font-family: serif;">(128 + 1) × 10</i></td>
+<td style="text-align:left"><strong>1,290</strong></td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>TOTAL</strong></td>
+<td style="text-align:left">—</td>
+<td style="text-align:left">—</td>
+<td style="text-align:left">—</td>
+<td style="text-align:left"><strong>All Trainable</strong></td>
+<td style="text-align:left"><strong>225,034</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>5.3 Training Hyperparameters &amp; Convergence Configuration</h3>
+<ul>
+<li><strong>Loss Formulation:</strong> Sparse Categorical Cross-Entropy:</li>
+</ul>
+<div class="math-display"><b><i>L</i></b> = - (1)(N) &sum;_(i=1)^(N) \log&le;ft(&sigma;(<b>z</b>^((i)))_(y^((i))))</div>
+- **Optimizer:** Adam with initial learning rate <i style="font-family: serif;">&alpha; = 0.001</i>, <i style="font-family: serif;">&beta;_1 = 0.9</i>, <i style="font-family: serif;">&beta;_2 = 0.999</i>, <i style="font-family: serif;">\epsilon = 10^{-7}</i>.
+- **Batch Size:** 128 samples per mini-batch step.
+- **Epochs:** 6 full iterations over the 60,000-sample training dataset.
+- **Reproducibility Guarantee:** Random seeds fixed across NumPy (`np.random.seed(42)`), TensorFlow (`tf.random.set_seed(42)`), and Python environments.
+- **Model Serialization:** Exported directly to modern native Keras v3 format as [`digit_model.keras`](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/digit_model.keras) (file size: ~2.7 MB).
+<hr />
+<!-- ========================================================================== -->
+<!-- PAGE 8: CHAPTER 6 - BACKEND REST API & PERSISTENCE ENGINE                  -->
+<!-- ========================================================================== -->
+            </div>
+            <div class="page-footer">
+                <span>Department of Computer Science &amp; Engineering</span>
+                <span>Page 7 of 13</span>
+            </div>
+        </div>
+        
+        <div class="page" id="report-page-8">
+            <div class="page-header">
+                <span>Handwritten Digit Recognition System &bull; Technical Capstone Report</span>
+                <span>Section 8 &bull; Phase 16</span>
+            </div>
+            <div class="page-content">
+                <h1 class="page-title">CHAPTER 6: BACKEND REST API & PERSISTENCE ENGINE</h1>
+                <h3>6.1 Flask API Architecture &amp; Routing Endpoints</h3>
+<p>The web server is constructed around a clean REST interface built with Python Flask:</p>
+<ol>
+<li><strong><code>GET /</code></strong>: Renders the primary single-page application dashboard ([<code>index.html</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/templates/index.html)).</li>
+<li><strong><code>GET /model-info</code></strong>: Renders the architectural evaluation and metrics report page ([<code>model_info.html</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/templates/model_info.html)).</li>
+<li><strong><code>GET /health</code></strong>: Healthcheck endpoint returning JSON status, version, and model memory load confirmation.</li>
+<li><strong><code>POST /predict</code></strong>: Accepts either a multipart/form-data image file or a JSON payload containing base64 data URLs. Returns predicted class, confidence, top 3 candidates, 10-class probability distribution, and preprocessing stage image data URLs.</li>
+<li><strong><code>GET /api/history</code></strong>: Queries stored predictions with support for search keywords, digit filtering, modality filtering, and dual-direction sorting.</li>
+<li><strong><code>DELETE /api/history/&lt;id&gt;</code> &amp; <code>DELETE /api/history</code></strong>: Granular and bulk record deletion handlers.</li>
+<li><strong><code>GET /api/history/export</code></strong>: Generates and downloads a UTF-8 BOM CSV export with formula injection mitigation.</li>
+<li><strong><code>POST /api/feedback</code> &amp; <code>GET /api/feedback/stats</code></strong>: Active learning feedback recording and real-time accuracy telemetry.</li>
+</ol>
+<h3>6.2 Relational Database Schema (SQLite 3)</h3>
+<p>Data persistence is handled by [<code>database.py</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/database.py) using an embedded SQLite 3 database (<code>history.db</code>). The database schema is fully indexed to ensure rapid sub-millisecond retrieval under large transaction volumes:</p>
+<p><em>Table 6.1: Database Schemas for History and Verification Logging.</em></p>
+<pre><code class="language-sql">-- Prediction records table
+CREATE TABLE IF NOT EXISTS predictions (
+    id TEXT PRIMARY KEY,
+    predicted_digit INTEGER NOT NULL,
+    confidence REAL NOT NULL,
+    input_type TEXT NOT NULL,
+    timestamp TEXT NOT NULL,
+    probabilities_json TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Active learning verification feedback table
+CREATE TABLE IF NOT EXISTS feedback (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    prediction_id TEXT NOT NULL UNIQUE,
+    feedback TEXT NOT NULL CHECK(feedback IN ('correct', 'incorrect')),
+    actual_digit INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (prediction_id) REFERENCES predictions(id) ON DELETE CASCADE
+);
+
+-- High-performance query indexes
+CREATE INDEX IF NOT EXISTS idx_predictions_timestamp ON predictions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_predictions_digit ON predictions(predicted_digit);
+CREATE INDEX IF NOT EXISTS idx_predictions_input_type ON predictions(input_type);
+</code></pre>
+<h3>6.3 Security Engineering: CSV Formula Injection Mitigation</h3>
+<p>When exporting historical predictions to CSV, malicious or adversarial inputs (e.g., custom IDs or corrupted data starting with <code>=</code>, <code>@</code>, <code>+</code>, or <code>-</code>) can trigger Dynamic Data Exchange (DDE) formulas in Microsoft Excel or Google Sheets. The export engine in [<code>database.py</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/database.py) systematically sanitizes every output cell:</p>
+<pre><code class="language-python">def sanitize_csv_cell(value: str) -&gt; str:
+    &quot;&quot;&quot;Neutralize formula injection triggers by prefixing apostrophes.&quot;&quot;&quot;
+    if value and str(value)[0] in ('=', '+', '-', '@', '\t', '\r'):
+        return f&quot;'{value}&quot;
+    return str(value)
+</code></pre>
+<p>Additionally, the byte-order mark (<code>\uFEFF</code>) is prepended to enforce UTF-8 decoding across all spreadsheet readers.</p>
+<hr />
+<!-- ========================================================================== -->
+<!-- PAGE 9: CHAPTER 7 - FRONTEND ENGINEERING & ANALYTICS VISUALIZATION         -->
+<!-- ========================================================================== -->
+            </div>
+            <div class="page-footer">
+                <span>Department of Computer Science &amp; Engineering</span>
+                <span>Page 8 of 13</span>
+            </div>
+        </div>
+        
+        <div class="page" id="report-page-9">
+            <div class="page-header">
+                <span>Handwritten Digit Recognition System &bull; Technical Capstone Report</span>
+                <span>Section 9 &bull; Phase 16</span>
+            </div>
+            <div class="page-content">
+                <h1 class="page-title">CHAPTER 7: FRONTEND ENGINEERING & ANALYTICS VISUALIZATION</h1>
+                <h3>7.1 High-DPI Interactive Drawing Canvas</h3>
+<p>The HTML5 drawing canvas is engineered for high accuracy and tactile smoothness across both desktop mice and mobile touch screens:</p>
+<ul>
+<li><strong>High-DPI Coordinate Scaling:</strong> Client coordinates derived from <code>MouseEvent</code> or <code>TouchEvent</code> are normalized against <code>canvas.getBoundingClientRect()</code> and scaled by the internal canvas resolution (<i style="font-family: serif;">280 × 280</i> px).</li>
+<li><strong>Touch Gesture Isolation:</strong> CSS declaration <code>touch-action: none</code> prevents accidental page scrolling, gesture panning, or viewport zoom interference during finger or stylus drawing.</li>
+<li><strong>Tooling Engine:</strong> Dual operational modes (Brush vs. Eraser) with stroke widths dynamically configurable between 4px and 32px, backed by quick presets (Fine, Medium, Bold).</li>
+<li><strong>Undo / Redo Multi-Level History:</strong> Maintains dual snapshot stacks (<code>canvasHistoryStack</code> and <code>canvasRedoStack</code>) using <code>ctx.getImageData()</code> to support non-destructive stroke rollbacks and reapplications.</li>
+</ul>
+<h3>7.2 Real-Time Debounced Auto-Prediction Engine</h3>
+<p>To streamline the user experience, the frontend includes a toggleable &quot;Auto-predict&quot; feature:</p>
+<ul>
+<li>Upon the completion of a stroke (<code>mouseup</code> or <code>touchend</code>), an internal timer triggers.</li>
+<li>If no further input occurs within <strong>700 milliseconds</strong>, the canvas is checked for minimum stroke content.</li>
+<li>If non-blank, the system dispatches an asynchronous <code>fetch('/predict')</code> request without requiring a manual button click.</li>
+<li>An MD5/state tracking hash ensures duplicate prediction requests are not dispatched if the canvas has not changed.</li>
+</ul>
+<h3>7.3 Probability Analytics with Chart.js</h3>
+<p>Model output probabilities are visualized using a Chart.js bar chart:</p>
+<ul>
+<li><strong>All 10 Digits Displayed:</strong> Every digit class (<i style="font-family: serif;">0</i> through <i style="font-family: serif;">9</i>) is represented on the horizontal axis.</li>
+<li><strong>Winning Class Highlighting:</strong> The predicted class is styled with a distinct primary accent color, while competing classes remain in neutral tones.</li>
+<li><strong>Top 3 Candidate Breakdown:</strong> The three highest-ranking candidates are extracted and rendered in dedicated cards with localized percentage badges.</li>
+</ul>
+<div class="diagram-card"><div class="diagram-row"><div class="diagram-node">CanvasHTML5 Canvas Input</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">StrokeUser Completes Stroke</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">Stroke</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">AutoPred{Auto-Predict Enabled?}</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">AutoPred -- Yes</div> <div class="diagram-arrow">&rarr;</div> <div class="diagram-node">Timer700ms Debounce Timer</div></div></div>
+<h3>7.4 Gamified &quot;Digit Challenge&quot; Mode</h3>
+<p>To demonstrate model capabilities under controlled conditions, the dashboard features an interactive challenge game:</p>
+<ul>
+<li>Generates a random target digit (<i style="font-family: serif;">0</i> through <i style="font-family: serif;">9</i>).</li>
+<li>Prompts the user to draw the specified number.</li>
+<li>Evaluates the model prediction against the target, awarding <i style="font-family: serif;">+10</i> points for matches and providing corrective guidance for misclassifications.</li>
+<li>Tracks score, total attempts, and running player accuracy in real time.</li>
+</ul>
+<hr />
+<!-- ========================================================================== -->
+<!-- PAGE 10: CHAPTER 8 - QUALITY ASSURANCE & VERIFICATION TESTING              -->
+<!-- ========================================================================== -->
+            </div>
+            <div class="page-footer">
+                <span>Department of Computer Science &amp; Engineering</span>
+                <span>Page 9 of 13</span>
+            </div>
+        </div>
+        
+        <div class="page" id="report-page-10">
+            <div class="page-header">
+                <span>Handwritten Digit Recognition System &bull; Technical Capstone Report</span>
+                <span>Section 10 &bull; Phase 16</span>
+            </div>
+            <div class="page-content">
+                <h1 class="page-title">CHAPTER 8: QUALITY ASSURANCE & VERIFICATION TESTING</h1>
+                <h3>8.1 Testing Philosophy and Strategy</h3>
+<p>A machine-learning web service requires verification across multiple domains: numerical tensor validation, format boundary handling, state management, API reliability, and UI DOM structure. A testing framework was established using Pytest to execute <strong>75 automated tests</strong> across 12 distinct test suites.</p>
+<p><em>Table 8.1: Test Suite Module Breakdown and Coverage Area.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Test Suite Module</th>
+<th style="text-align:center">Test Count</th>
+<th style="text-align:left">Domain / Responsibilities Tested</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">[<code>test_app.py</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/tests/test_app.py)</td>
+<td style="text-align:center">23</td>
+<td style="text-align:left">Healthcheck, base64 payloads, invalid types, oversized files, missing assets</td>
+</tr>
+<tr>
+<td style="text-align:left">[<code>test_preprocessing.py</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/tests/test_preprocessing.py)</td>
+<td style="text-align:center">12</td>
+<td style="text-align:left">Dimensions <i style="font-family: serif;">(1, 28, 28, 1)</i>, polarity detection, format handling, blank rejection</td>
+</tr>
+<tr>
+<td style="text-align:left">[<code>test_preprocessing_visualization.py</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/tests/test_preprocessing_visualization.py)</td>
+<td style="text-align:center">4</td>
+<td style="text-align:left">Preprocessing metadata, data URL generation, dual background polarities</td>
+</tr>
+<tr>
+<td style="text-align:left">[<code>test_canvas.py</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/tests/test_canvas.py)</td>
+<td style="text-align:center">5</td>
+<td style="text-align:left">Canvas DOM nodes, synthetic digit predictions (0 &amp; 3), blank canvas block</td>
+</tr>
+<tr>
+<td style="text-align:left">[<code>test_database_api.py</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/tests/test_database_api.py)</td>
+<td style="text-align:center">5</td>
+<td style="text-align:left">SQLite persistence, filtering/sorting, feedback API, CSV export, record deletion</td>
+</tr>
+<tr>
+<td style="text-align:left">[<code>test_enhanced_results.py</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/tests/test_enhanced_results.py)</td>
+<td style="text-align:center">4</td>
+<td style="text-align:left">Top-3 descending order, probability consistency <i style="font-family: serif;">\sum p_i \approx 1.0</i>, DOM nodes</td>
+</tr>
+<tr>
+<td style="text-align:left">[<code>test_gallery.py</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/tests/test_gallery.py)</td>
+<td style="text-align:center">5</td>
+<td style="text-align:left">Sample file integrity (0–9), <code>/api/samples</code> endpoint, ground truth verification</td>
+</tr>
+<tr>
+<td style="text-align:left">[<code>test_history.py</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/tests/test_history.py)</td>
+<td style="text-align:center">5</td>
+<td style="text-align:left">HTML containers, CSS classes, sessionStorage schemas, FIFO queue trimming</td>
+</tr>
+<tr>
+<td style="text-align:left">[<code>test_csv_export.py</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/tests/test_csv_export.py)</td>
+<td style="text-align:center">3</td>
+<td style="text-align:left">Button presence, script definition, simulated CSV escaping rules</td>
+</tr>
+<tr>
+<td style="text-align:left">[<code>test_model.py</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/tests/test_model.py)</td>
+<td style="text-align:center">3</td>
+<td style="text-align:left">File existence, tensor input/output shapes, 10-class probability sums</td>
+</tr>
+<tr>
+<td style="text-align:left">[<code>test_model_info.py</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/tests/test_model_info.py)</td>
+<td style="text-align:center">3</td>
+<td style="text-align:left"><code>/model-info</code> page render, <code>evaluation_metrics.json</code> validity, graceful fallback</td>
+</tr>
+<tr>
+<td style="text-align:left">[<code>test_integration.py</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/tests/test_integration.py)</td>
+<td style="text-align:center">3</td>
+<td style="text-align:left">Sequential dynamic inference, full schema compliance, error flow recovery</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>TOTAL VERIFIED TESTS</strong></td>
+<td style="text-align:center"><strong>75</strong></td>
+<td style="text-align:left"><strong>100% Pass Rate across all 12 test modules</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>8.2 Boundary &amp; Adversarial Handling Verification</h3>
+<ul>
+<li><strong>Blank Image Rejection:</strong> Verified that solid white images, solid black images, and uniform backgrounds are intercepted and return <code>HTTP 400 Bad Request</code> with an explanatory error message, preventing meaningless predictions.</li>
+<li><strong>Polarity Invariance:</strong> Verified that dark strokes on light paper and white strokes on dark canvases yield identical tensor polarities with foreground values <i style="font-family: serif;">&gt;0</i>.</li>
+<li><strong>Oversized &amp; Corrupt Files:</strong> Confirmed that corrupt byte payloads and requests exceeding 2 MB are rejected gracefully without unhandled server exceptions.</li>
+<li><strong>Zero Leakage:</strong> Regression tests confirm that internal Python stack traces are intercepted and sanitized before API responses are returned to the client.</li>
+</ul>
+<hr />
+<!-- ========================================================================== -->
+<!-- PAGE 11: CHAPTER 9 - EXPERIMENTAL RESULTS & MODEL EVALUATION               -->
+<!-- ========================================================================== -->
+            </div>
+            <div class="page-footer">
+                <span>Department of Computer Science &amp; Engineering</span>
+                <span>Page 10 of 13</span>
+            </div>
+        </div>
+        
+        <div class="page" id="report-page-11">
+            <div class="page-header">
+                <span>Handwritten Digit Recognition System &bull; Technical Capstone Report</span>
+                <span>Section 11 &bull; Phase 16</span>
+            </div>
+            <div class="page-content">
+                <h1 class="page-title">CHAPTER 9: EXPERIMENTAL RESULTS & MODEL EVALUATION</h1>
+                <h3>9.1 Global Classification Performance</h3>
+<p>Model performance was formally benchmarked across the complete 10,000-image MNIST test dataset. The evaluation metrics were recorded in [<code>evaluation_metrics.json</code>](file:///d:/RealTimeWork/Handwritten%20Digit%20Recognition/evaluation_metrics.json):</p>
+<ul>
+<li><strong>Overall Test Accuracy:</strong> <strong>99.10%</strong> (<i style="font-family: serif;">9,910</i> correct classifications out of <i style="font-family: serif;">10,000</i> test images)</li>
+<li><strong>Categorical Cross-Entropy Loss:</strong> <strong>0.0262</strong></li>
+<li><strong>Macro-Averaged Precision:</strong> <strong>0.9910</strong></li>
+<li><strong>Macro-Averaged Recall:</strong> <strong>0.9909</strong></li>
+<li><strong>Macro-Averaged F1-Score:</strong> <strong>0.9909</strong></li>
+</ul>
+<h3>9.2 Per-Class Detailed Performance Breakdown</h3>
+<p>Evaluating performance on individual digit classes confirms uniform classification quality across all numerical categories:</p>
+<p><em>Table 9.1: Comprehensive Per-Class Performance Breakdown.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Digit Class</th>
+<th style="text-align:center">Precision</th>
+<th style="text-align:center">Recall</th>
+<th style="text-align:center">F1-Score</th>
+<th style="text-align:center">Support (Sample Count)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><strong>0</strong></td>
+<td style="text-align:center">0.9869</td>
+<td style="text-align:center">0.9969</td>
+<td style="text-align:center">0.9919</td>
+<td style="text-align:center">980</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>1</strong></td>
+<td style="text-align:center">0.9939</td>
+<td style="text-align:center">0.9974</td>
+<td style="text-align:center">0.9956</td>
+<td style="text-align:center">1,135</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>2</strong></td>
+<td style="text-align:center">0.9913</td>
+<td style="text-align:center">0.9932</td>
+<td style="text-align:center">0.9923</td>
+<td style="text-align:center">1,032</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>3</strong></td>
+<td style="text-align:center">0.9901</td>
+<td style="text-align:center">0.9921</td>
+<td style="text-align:center">0.9911</td>
+<td style="text-align:center">1,010</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>4</strong></td>
+<td style="text-align:center">0.9959</td>
+<td style="text-align:center">0.9949</td>
+<td style="text-align:center">0.9954</td>
+<td style="text-align:center">982</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>5</strong></td>
+<td style="text-align:center">0.9865</td>
+<td style="text-align:center">0.9865</td>
+<td style="text-align:center">0.9865</td>
+<td style="text-align:center">892</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>6</strong></td>
+<td style="text-align:center">0.9926</td>
+<td style="text-align:center">0.9864</td>
+<td style="text-align:center">0.9895</td>
+<td style="text-align:center">958</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>7</strong></td>
+<td style="text-align:center">0.9846</td>
+<td style="text-align:center">0.9922</td>
+<td style="text-align:center">0.9884</td>
+<td style="text-align:center">1,028</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>8</strong></td>
+<td style="text-align:center">0.9938</td>
+<td style="text-align:center">0.9897</td>
+<td style="text-align:center">0.9918</td>
+<td style="text-align:center">974</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>9</strong></td>
+<td style="text-align:center">0.9940</td>
+<td style="text-align:center">0.9792</td>
+<td style="text-align:center">0.9865</td>
+<td style="text-align:center">1,009</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>OVERALL / AVG</strong></td>
+<td style="text-align:center"><strong>0.9910</strong></td>
+<td style="text-align:center"><strong>0.9910</strong></td>
+<td style="text-align:center"><strong>0.9910</strong></td>
+<td style="text-align:center"><strong>10,000</strong></td>
+</tr>
+</tbody>
+</table>
+<h3>9.3 Empirical Confusion Matrix Analysis</h3>
+<p>The <i style="font-family: serif;">10 × 10</i> confusion matrix reflects low off-diagonal confusion across the entire test set:</p>
+<p><em>Table 9.2: Complete <i style="font-family: serif;">10 × 10</i> Confusion Matrix for the 10,000 MNIST Test Set.</em></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">Predicted <i style="font-family: serif;">→</i><br>Actual <i style="font-family: serif;">\downarrow</i></th>
+<th style="text-align:center">0</th>
+<th style="text-align:center">1</th>
+<th style="text-align:center">2</th>
+<th style="text-align:center">3</th>
+<th style="text-align:center">4</th>
+<th style="text-align:center">5</th>
+<th style="text-align:center">6</th>
+<th style="text-align:center">7</th>
+<th style="text-align:center">8</th>
+<th style="text-align:center">9</th>
+<th style="text-align:center">Total</th>
+<th style="text-align:center">Accuracy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><strong>0</strong></td>
+<td style="text-align:center"><strong>977</strong></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">980</td>
+<td style="text-align:center">99.69%</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>1</strong></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center"><strong>1132</strong></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1,135</td>
+<td style="text-align:center">99.74%</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>2</strong></td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center"><strong>1025</strong></td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1,032</td>
+<td style="text-align:center">99.32%</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>3</strong></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center"><strong>1002</strong></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1,010</td>
+<td style="text-align:center">99.21%</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>4</strong></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center"><strong>977</strong></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">982</td>
+<td style="text-align:center">99.49%</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>5</strong></td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center"><strong>880</strong></td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">892</td>
+<td style="text-align:center">98.65%</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>6</strong></td>
+<td style="text-align:center">5</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center"><strong>945</strong></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">958</td>
+<td style="text-align:center">98.64%</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>7</strong></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center"><strong>1020</strong></td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1,028</td>
+<td style="text-align:center">99.22%</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>8</strong></td>
+<td style="text-align:center">4</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">2</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center"><strong>964</strong></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">974</td>
+<td style="text-align:center">98.97%</td>
+</tr>
+<tr>
+<td style="text-align:center"><strong>9</strong></td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">3</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">6</td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">7</td>
+<td style="text-align:center">1</td>
+<td style="text-align:center"><strong>988</strong></td>
+<td style="text-align:center">1,009</td>
+<td style="text-align:center">97.92%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Key Diagnostic Insights:</strong></p>
+<ol>
+<li><strong>Digit 1</strong> achieved the highest individual recall (<i style="font-family: serif;">99.74%</i>), misclassifying only 3 instances out of 1,135.</li>
+<li>The most common minor confusion occurs between <strong>Digit 9</strong> and <strong>Digit 7</strong> (7 instances of 9 classified as 7), and <strong>Digit 9</strong> and <strong>Digit 5</strong> (6 instances of 9 classified as 5), reflecting ambiguous handwritten strokes where the top loop of a 9 is left open.</li>
+<li>Total misclassifications across the entire test set amounted to only <strong>90 images</strong> out of 10,000.</li>
+</ol>
+<hr />
+<!-- ========================================================================== -->
+<!-- PAGE 12: CHAPTER 10 - USER MANUAL & PRODUCTION DEPLOYMENT                  -->
+<!-- ========================================================================== -->
+            </div>
+            <div class="page-footer">
+                <span>Department of Computer Science &amp; Engineering</span>
+                <span>Page 11 of 13</span>
+            </div>
+        </div>
+        
+        <div class="page" id="report-page-12">
+            <div class="page-header">
+                <span>Handwritten Digit Recognition System &bull; Technical Capstone Report</span>
+                <span>Section 12 &bull; Phase 16</span>
+            </div>
+            <div class="page-content">
+                <h1 class="page-title">CHAPTER 10: USER MANUAL & PRODUCTION DEPLOYMENT</h1>
+                <h3>10.1 Quick Start Installation &amp; Execution</h3>
+<p>The application requires a standard Python 3.10+ environment:</p>
+<pre><code class="language-bash"># 1. Navigate to the project root directory
+cd &quot;d:\RealTimeWork\Handwritten Digit Recognition&quot;
+
+# 2. Activate Python virtual environment
+.venv\Scripts\activate   # On Windows PowerShell / CMD
+# source .venv/bin/activate  # On Linux / macOS
+
+# 3. Verify dependencies
+pip install -r requirements.txt
+
+# 4. Start the Flask application server
+python app.py
+</code></pre>
+<p>Upon startup, the server loads <code>digit_model.keras</code> into memory and initializes <code>history.db</code>. The application is accessible at:</p>
+<ul>
+<li><strong>Primary Dashboard:</strong> <code>http://127.0.0.1:5000/</code></li>
+<li><strong>Model Architecture &amp; Analytics:</strong> <code>http://127.0.0.1:5000/model-info</code></li>
+</ul>
+<h3>10.2 User Walkthrough &amp; Operational Guide</h3>
+<h4>Mode 1: Interactive Canvas Drawing</h4>
+<ol>
+<li>Select the <strong>Draw Digit</strong> tab.</li>
+<li>Choose a drawing tool (<strong>Brush</strong> or <strong>Eraser</strong>) and adjust the stroke size slider or select a preset (Fine, Medium, Bold).</li>
+<li>Draw a digit (<i style="font-family: serif;">0</i> through <i style="font-family: serif;">9</i>) inside the canvas boundaries.</li>
+<li>If <strong>Auto-predict</strong> is enabled, wait ~700ms after drawing; otherwise, click <strong>Predict Digit</strong> or press <code>P</code>.</li>
+<li>View the predicted digit, confidence percentage, top 3 ranking candidates, and the Chart.js probability distribution.</li>
+<li>Click <strong>Show Details ▼</strong> to inspect the 6-stage image preprocessing breakdown.</li>
+</ol>
+<h4>Mode 2: Image File Upload</h4>
+<ol>
+<li>Switch to the <strong>Upload Image</strong> tab.</li>
+<li>Drag and drop an image file (PNG, JPG, JPEG under 2 MB) into the drop zone, or click to open the file browser.</li>
+<li>Review the image preview and file dimensions, then click <strong>Predict Uploaded Image</strong>.</li>
+</ol>
+<h4>Mode 3: MNIST Sample Gallery</h4>
+<ol>
+<li>Select the <strong>Sample Gallery</strong> tab.</li>
+<li>Choose any pre-rendered MNIST test digit (<i style="font-family: serif;">0</i> through <i style="font-family: serif;">9</i>) to load it into memory.</li>
+<li>Click <strong>Predict Sample Digit</strong> to verify model behavior against standardized ground truths.</li>
+</ol>
+<h4>Mode 4: Digit Challenge Mode</h4>
+<ol>
+<li>Select the <strong>Digit Challenge</strong> tab.</li>
+<li>Note the generated target number in the challenge badge.</li>
+<li>Draw the requested digit and click <strong>Submit Challenge</strong>.</li>
+<li>The system updates your score (+10 pts per match), total attempts, and running accuracy.</li>
+</ol>
+<h4>History Management &amp; CSV Export</h4>
+<ul>
+<li>Use the search bar in the <strong>Recent Predictions History</strong> panel to filter entries by keyword, digit, or input type.</li>
+<li>Click any entry to re-inspect its full probability distribution.</li>
+<li>Click <strong>Export CSV</strong> to download historical records in a formula-safe format.</li>
+<li>Click <strong>Clear History</strong> to purge all stored records (with confirmation).</li>
+</ul>
+<hr />
+<!-- ========================================================================== -->
+<!-- PAGE 13: CHAPTER 11 - CONCLUSION, FUTURE SCOPE & REFERENCES                -->
+<!-- ========================================================================== -->
+            </div>
+            <div class="page-footer">
+                <span>Department of Computer Science &amp; Engineering</span>
+                <span>Page 12 of 13</span>
+            </div>
+        </div>
+        
+        <div class="page" id="report-page-13">
+            <div class="page-header">
+                <span>Handwritten Digit Recognition System &bull; Technical Capstone Report</span>
+                <span>Section 13 &bull; Phase 16</span>
+            </div>
+            <div class="page-content">
+                <h1 class="page-title">CHAPTER 11: CONCLUSION, FUTURE SCOPE & REFERENCES</h1>
+                <h3>11.1 Project Summary</h3>
+<p>This project successfully designed, implemented, and verified an end-to-end Handwritten Digit Recognition system combining deep learning with a modern web dashboard.</p>
+<p>Key milestones achieved include:</p>
+<ol>
+<li><strong>High-Accuracy CNN Backbone:</strong> 99.10% test accuracy on MNIST with 225,034 parameters.</li>
+<li><strong>Domain-Robust Computer Vision Pipeline:</strong> 6-stage preprocessing that resolves differences in polarity, stroke width, bounding box scale, and center-of-mass alignment.</li>
+<li><strong>Responsive Web Dashboard:</strong> Interactive canvas with high-DPI scaling, touch support, undo/redo, auto-prediction, Chart.js analytics, and light/dark theme options.</li>
+<li><strong>Persistent SQLite Database:</strong> Searchable history storage with formula-injection-safe CSV export and active learning verification feedback.</li>
+<li><strong>Quality Assurance:</strong> 100% pass rate across a comprehensive 75-test automated suite covering API routes, ML inference, and edge cases.</li>
+</ol>
+<h3>11.2 System Limitations</h3>
+<ul>
+<li><strong>Isolated Digit Constraint:</strong> The current model is designed for single-digit recognition (<i style="font-family: serif;">0</i> through <i style="font-family: serif;">9</i>). Multi-digit strings (e.g., zip codes or math expressions) require an upstream segmentation algorithm before classification.</li>
+<li><strong>Extreme Perspective Distortion:</strong> Severe perspective skew or rotations exceeding <i style="font-family: serif;">\pm 45^\circ</i> can degrade recognition confidence due to lack of heavy rotational augmentation during training.</li>
+<li><strong>Complex Textures:</strong> Inputs drawn on heavily textured, watermarked, or patterned backgrounds may introduce noise during thresholding.</li>
+</ul>
+<h3>11.3 Future Development Roadmap</h3>
+<ol>
+<li><strong>Connected Component Segmentation:</strong> Incorporate sliding-window or contour-based segmentation to process multi-digit sequences.</li>
+<li><strong>Model Modernization:</strong> Benchmark lightweight Vision Transformers (ViT) and MobileNetV3 backbones against the current CNN.</li>
+<li><strong>Extended Character Recognition:</strong> Expand the architecture to support the full 62-class EMNIST dataset (digits, uppercase, and lowercase characters).</li>
+<li><strong>On-Device Edge Inference:</strong> Port model inference to client-side WebAssembly (TensorFlow.js / ONNX Runtime Web) to reduce server load.</li>
+</ol>
+<h3>11.4 References &amp; Bibliography</h3>
+<ol>
+<li>LeCun, Y., Bottou, L., Bengio, Y., &amp; Haffner, P. (1998). <em>Gradient-based learning applied to document recognition.</em> Proceedings of the IEEE, 86(11), 2278-2324.</li>
+<li>Goodfellow, I., Bengio, Y., &amp; Courville, A. (2016). <em>Deep Learning.</em> MIT Press.</li>
+<li>Kingma, D. P., &amp; Ba, J. (2014). <em>Adam: A Method for Stochastic Optimization.</em> arXiv preprint arXiv:1412.6980.</li>
+<li>Srivastava, N., Hinton, G., Krizhevsky, A., Sutskever, I., &amp; Salakhutdinov, R. (2014). <em>Dropout: A simple way to prevent neural networks from overfitting.</em> The Journal of Machine Learning Research, 15(1), 1929-1958.</li>
+<li>Chollet, F. (2021). <em>Deep Learning with Python (2nd ed.).</em> Manning Publications.</li>
+<li>OWASP Foundation. (2023). <em>CSV Injection (Formula Injection) Prevention Cheat Sheet.</em> OWASP Security Guides.</li>
+<li>World Wide Web Consortium (W3C). (2018). <em>Web Content Accessibility Guidelines (WCAG) 2.1.</em> W3C Recommendation.</li>
+</ol>
+<pre><code>========================================================================================
+                          END OF TECHNICAL PROJECT REPORT
+========================================================================================
+</code></pre>
+
+            </div>
+            <div class="page-footer">
+                <span>Department of Computer Science &amp; Engineering</span>
+                <span>Page 13 of 13</span>
+            </div>
+        </div>
+        
+</body>
+</html>

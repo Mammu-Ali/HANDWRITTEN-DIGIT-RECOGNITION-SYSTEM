@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handwritten Digit Recognition &bull; MNIST Deep Learning System</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Chart.js 4 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+    <!-- Custom Application CSS (with cache-busting query parameter) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=5.0">
+</head>
+<body>
+
+    <!-- =========================================================================
+         Header / Top Navigation Bar
+         ========================================================================= -->
+    <header class="app-header">
+        <div class="app-container header-inner">
+            <!-- Left: Brand Logo & Title -->
+            <a href="/" class="app-brand" style="text-decoration: none;">
+                <div class="brand-icon-box" aria-hidden="true">
+                    <i class="bi bi-cpu text-white fs-5"></i>
+                </div>
+                <div>
+                    <h1 class="brand-title">Handwritten Digit Recognition</h1>
+                    <p class="brand-subtitle">MNIST Deep Learning Classification System</p>
+                </div>
+            </a>
+
+            <!-- Right: Navigation Pills, Shortcuts, Theme Toggle & Status Indicator -->
+            <div class="header-actions">
+                <nav class="nav-pill-group d-none d-md-flex" aria-label="Main Navigation">
+                    <a href="/" class="nav-pill-link active" title="Digit Recognizer Workspace">
+                        <i class="bi bi-pencil-square"></i> Recognizer
+                    </a>
+                    <a href="/model-info" class="nav-pill-link" title="Model Architecture and Metrics">
+                        <i class="bi bi-bar-chart-line"></i> Model Info
+                    </a>
+                    <button type="button" class="nav-pill-link border-0 bg-transparent" data-bs-toggle="modal" data-bs-target="#shortcutsModal" title="Keyboard Shortcuts">
+                        <i class="bi bi-keyboard"></i> Shortcuts
+                    </button>
+                    <button type="button" class="nav-pill-link border-0 bg-transparent" data-bs-toggle="modal" data-bs-target="#aboutModal" title="About this Project">
+                        <i class="bi bi-info-circle"></i> About
+                    </button>
+                </nav>
+
+                <!-- Theme Toggle Button -->
+                <button type="button" class="theme-toggle-btn" id="theme-toggle-btn" title="Toggle Light / Dark Mode" aria-label="Toggle theme">
+                    <svg id="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/></svg>
+                    <svg id="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" class="d-none" viewBox="0 0 16 16"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/></svg>
+                </button>
+
+                <!-- Model Status Pill Badge -->
+                <div class="status-pill-badge" id="api-status-badge">
+                    <span class="status-dot pulse"></span>
+                    <span id="api-status-text">Model Ready</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- =========================================================================
+         Main Application Workspace
+         ========================================================================= -->
+    <main class="main-content">
+        <div class="app-container">
+
+            <!-- =================================================================
+                 ROW 1: Main Workspace (Left Input ~56%, Right Results ~44%)
+                 ================================================================= -->
+            <div class="workspace-grid">
+                
+                <!-- Left Panel: Input Workspace Card -->
+                <div class="card-workspace">
+                    <!-- Segmented Tabs Header -->
+                    <div class="card-header-clean p-2">
+                        <div class="segmented-tabs" id="input-tabs" role="tablist">
+                            <button type="button" class="segmented-tab-btn active" id="tab-draw-btn" data-bs-toggle="tab" data-bs-target="#tab-draw-pane" role="tab" aria-controls="tab-draw-pane" aria-selected="true">
+                                <i class="bi bi-brush"></i> Draw Digit
+                            </button>
+                            <button type="button" class="segmented-tab-btn" id="tab-upload-btn" data-bs-toggle="tab" data-bs-target="#tab-upload-pane" role="tab" aria-controls="tab-upload-pane" aria-selected="false">
+                                <i class="bi bi-cloud-arrow-up"></i> Upload Image
+                            </button>
+                            <button type="button" class="segmented-tab-btn" id="tab-gallery-btn" data-bs-toggle="tab" data-bs-target="#tab-gallery-pane" role="tab" aria-controls="tab-gallery-pane" aria-selected="false">
+                                <i class="bi bi-grid-3x3"></i> Sample Gallery
+                            </button>
+                            <button type="button" class="segmented-tab-btn" id="tab-challenge-btn" data-bs-toggle="tab" data-bs-target="#tab-challenge-pane" role="tab" aria-controls="tab-challenge-pane" aria-selected="false">
+                                <i class="bi bi-trophy"></i> Challenge
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Tab Content Area -->
+                    <div class="card-body-clean">
+                        <div class="tab-content" id="input-tab-content">
+                            
+                            <!-- TAB 1: Enhanced Interactive Drawing Canvas -->
+                            <div class="tab-pane fade show active" id="tab-draw-pane" role="tabpanel" aria-labelledby="tab-draw-btn">
+                                <div class="canvas-wrapper">
+                                    
+                                    <!-- Canvas Mode Toolbar: Brush/Eraser & Auto-Predict -->
+                                    <div class="canvas-toolbar">
+                                        <div class="tool-btn-group" role="group" aria-label="Drawing Tools">
+                                            <button type="button" class="tool-toggle-btn active" id="btn-tool-brush" title="Brush Tool (Key: B)">
+                                                <i class="bi bi-brush"></i> Brush
+                                            </button>
+                                            <button type="button" class="tool-toggle-btn" id="btn-tool-eraser" title="Eraser Tool (Key: E)">
+                                                <i class="bi bi-eraser"></i> Eraser
+                                            </button>
+                                        </div>
+
+                                        <!-- Auto-Predict Toggle Switch -->
+                                        <label class="auto-predict-wrap" title="Automatically recognize digit ~700ms after stroke completes">
+                                            <input type="checkbox" id="auto-predict-toggle">
+                                            <span>Auto Predict</span>
+                                        </label>
+                                    </div>
+
+                                    <!-- Canvas Box with Responsive Coordinates & Corner Controls -->
+                                    <div class="canvas-box">
+                                        <button type="button" class="canvas-corner-btn undo-pos" id="canvas-corner-undo-btn" title="Undo stroke (Ctrl+Z)" disabled>
+                                            <i class="bi bi-arrow-counterclockwise"></i>
+                                        </button>
+                                        <button type="button" class="canvas-corner-btn clear-pos" id="canvas-corner-clear-btn" title="Clear canvas (C)">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                        <canvas id="drawing-canvas" width="280" height="280" class="drawing-canvas" aria-label="Interactive digit drawing canvas"></canvas>
+                                    </div>
+
+                                    <!-- Brush Slider & Presets -->
+                                    <div class="brush-controls-wrap">
+                                        <div class="brush-header">
+                                            <label for="brush-size" id="brush-size-label">Brush Size</label>
+                                            <span id="brush-size-val">16px</span>
+                                        </div>
+                                        <div class="brush-slider-row">
+                                            <input type="range" class="brush-slider" id="brush-size" min="4" max="32" value="16" aria-label="Brush size slider">
+                                            <div class="brush-dots">
+                                                <button type="button" class="brush-dot-btn" data-size="8" title="8px brush"><span class="inner-dot" style="width: 5px; height: 5px;"></span></button>
+                                                <button type="button" class="brush-dot-btn" data-size="12" title="12px brush"><span class="inner-dot" style="width: 8px; height: 8px;"></span></button>
+                                                <button type="button" class="brush-dot-btn active" data-size="16" title="16px brush"><span class="inner-dot" style="width: 11px; height: 11px;"></span></button>
+                                                <button type="button" class="brush-dot-btn" data-size="24" title="24px brush"><span class="inner-dot" style="width: 14px; height: 14px;"></span></button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Actions Row: Predict, Undo, Redo, Clear -->
+                                    <div class="actions-row">
+                                        <button type="button" class="btn-predict" id="canvas-predict-btn">
+                                            <span id="canvas-predict-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                            <i class="bi bi-stars"></i>
+                                            <span id="canvas-predict-btn-text">Predict Digit</span>
+                                        </button>
+                                        <button type="button" class="btn-secondary-action" id="canvas-undo-btn" title="Undo stroke (Ctrl+Z)" disabled>
+                                            Undo
+                                        </button>
+                                        <button type="button" class="btn-secondary-action" id="canvas-redo-btn" title="Redo stroke (Ctrl+Y)" disabled>
+                                            Redo
+                                        </button>
+                                        <button type="button" class="btn-secondary-action" id="canvas-clear-btn" title="Clear canvas (C)">
+                                            Clear
+                                        </button>
+                                    </div>
+
+                                    <!-- Instruction Hint with Keyboard Shortcuts Link -->
+                                    <p class="canvas-hint">
+                                        Draw a single digit (0–9) centered on the canvas using mouse, touch, or stylus.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- TAB 2: Image File Upload -->
+                            <div class="tab-pane fade" id="tab-upload-pane" role="tabpanel" aria-labelledby="tab-upload-btn">
+                                <div class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="Image drop zone">
+                                    <input type="file" id="file-input" class="d-none" accept=".png,.jpg,.jpeg,image/png,image/jpeg">
+                                    
+                                    <div id="drop-prompt" class="d-flex flex-column align-items-center">
+                                        <div class="upload-icon-circle">
+                                            <i class="bi bi-cloud-arrow-up text-primary fs-4"></i>
+                                        </div>
+                                        <div class="fw-bold text-navy mb-1" style="font-size: 0.9rem;">Drag &amp; drop digit image</div>
+                                        <p class="text-muted extra-small mb-2">or select a file from your device</p>
+                                        <button type="button" class="btn btn-sm btn-outline-primary px-3 rounded-pill" id="browse-btn">Browse Files</button>
+                                        <span class="text-muted extra-small mt-2">PNG, JPG, JPEG &bull; Max 2 MB</span>
+                                    </div>
+
+                                    <div id="preview-wrapper" class="d-none d-flex flex-column align-items-center">
+                                        <img id="image-preview" src="#" alt="Selected digit preview" class="img-fluid rounded border mb-2" style="max-height: 120px;">
+                                        <div class="extra-small fw-semibold text-navy mb-1" id="file-details">filename.png</div>
+                                        <span class="badge bg-light text-secondary border extra-small">Click to replace file</span>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn-predict flex-grow-1" id="predict-btn" disabled>
+                                        <span id="predict-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                        <span id="predict-btn-text">Predict Digit</span>
+                                    </button>
+                                    <button type="button" class="btn-secondary-action px-3" id="clear-btn" disabled>Clear</button>
+                                </div>
+                            </div>
+
+                            <!-- TAB 3: Sample Gallery Tab -->
+                            <div class="tab-pane fade" id="tab-gallery-pane" role="tabpanel" aria-labelledby="tab-gallery-btn">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="text-muted extra-small">Click any pre-loaded MNIST sample digit below</span>
+                                    <span class="badge bg-light text-navy border extra-small" id="gallery-selected-badge">No sample selected</span>
+                                </div>
+                                <div class="sample-grid-2x5 mb-3">
+                                    {% for d in range(10) %}
+                                    <div class="sample-digit-card" data-digit="{{ d }}" data-src="/samples/sample_digit_{{ d }}.png" role="button" tabindex="0">
+                                        <img src="/samples/sample_digit_{{ d }}.png" alt="Digit {{ d }}" class="sample-thumb pixelated">
+                                        <span class="sample-digit-label">Digit {{ d }}</span>
+                                        <span class="d-none sample-ground-truth">Ground Truth: {{ d }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn-predict flex-grow-1" id="gallery-predict-btn" disabled>
+                                        <span id="gallery-predict-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                        <span id="gallery-predict-btn-text">Predict Sample Digit</span>
+                                    </button>
+                                    <button type="button" class="btn-secondary-action px-3" id="gallery-clear-btn" disabled>Deselect</button>
+                                </div>
+                            </div>
+
+                            <!-- TAB 4: Digit Challenge Game Mode -->
+                            <div class="tab-pane fade" id="tab-challenge-pane" role="tabpanel" aria-labelledby="tab-challenge-btn">
+                                <div class="challenge-box">
+                                    <div>
+                                        <span class="text-muted extra-small text-uppercase fw-bold letter-spacing">Your Target Digit</span>
+                                        <div class="challenge-target-circle mx-auto my-2" id="challenge-target-digit">7</div>
+                                        <p class="extra-small text-muted mb-0">Switch to the canvas tab, draw this target, then test your score!</p>
+                                    </div>
+
+                                    <div class="challenge-stats-grid">
+                                        <div class="challenge-stat-card">
+                                            <div class="challenge-stat-val text-primary" id="challenge-score">0</div>
+                                            <div class="challenge-stat-lbl">Points</div>
+                                        </div>
+                                        <div class="challenge-stat-card">
+                                            <div class="challenge-stat-val text-navy" id="challenge-attempts">0</div>
+                                            <div class="challenge-stat-lbl">Rounds</div>
+                                        </div>
+                                        <div class="challenge-stat-card">
+                                            <div class="challenge-stat-val text-success" id="challenge-accuracy">0%</div>
+                                            <div class="challenge-stat-lbl">Accuracy</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="challenge-feedback-msg bg-light text-navy d-none" id="challenge-feedback-box">
+                                        <!-- Feedback populates here -->
+                                    </div>
+
+                                    <div class="d-flex gap-2 w-100">
+                                        <button type="button" class="btn btn-sm btn-primary flex-grow-1 rounded-pill" id="challenge-submit-btn">
+                                            <i class="bi bi-check-circle"></i> Test Current Drawing
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill" id="challenge-next-btn">
+                                            Next Target &rarr;
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" id="challenge-reset-btn" title="Reset score">
+                                            Reset
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel: Prediction Results Workspace -->
+                <div class="card-workspace">
+                    <div class="card-header-clean">
+                        <h2 class="card-header-title">
+                            <i class="bi bi-bullseye text-primary"></i>
+                            Prediction Result
+                        </h2>
+                        <span class="badge bg-light text-secondary border extra-small" id="result-status-badge">Ready to Recognize</span>
+                    </div>
+
+                    <div class="card-body-clean">
+                        <div class="prediction-panel-wrap">
+                            
+                            <!-- 1. Engaging Empty State Before Prediction -->
+                            <div id="state-empty" class="empty-state-card">
+                                <div class="ai-icon-bubble">
+                                    <i class="bi bi-cpu fs-3"></i>
+                                </div>
+                                <h3 class="empty-state-heading">Ready to recognize</h3>
+                                <p class="empty-state-desc">Draw a digit, upload an image, or choose a sample to begin.</p>
+                                <div class="digit-support-badge">
+                                    <span class="dot"></span>
+                                    Classifies digits 0 to 9
+                                </div>
+                                <p class="empty-instruction">The trained Convolutional Neural Network will analyze stroke patterns and calculate classification probabilities in real time.</p>
+                            </div>
+
+                            <!-- 2. Loading State -->
+                            <div id="state-loading" class="loading-state-card d-none" aria-live="polite">
+                                <div class="spinner-border text-primary mb-2" style="width: 2.25rem; height: 2.25rem;" role="status">
+                                    <span class="visually-hidden">Analyzing digit...</span>
+                                </div>
+                                <h3 class="empty-state-heading">Analyzing digit...</h3>
+                                <p class="empty-state-desc mb-0">Executing 2D CNN inference pipeline.</p>
+                            </div>
+
+                            <!-- 3. Error State -->
+                            <div id="state-error" class="d-none my-auto" role="alert" aria-live="assertive">
+                                <div class="alert alert-danger border-0 d-flex align-items-start mb-0 p-3 rounded-3">
+                                    <i class="bi bi-exclamation-triangle-fill text-danger fs-5 me-2 mt-1"></i>
+                                    <div>
+                                        <h4 class="h6 alert-heading fw-bold mb-1">Prediction Error</h4>
+                                        <p class="mb-0 extra-small" id="error-message">Unable to process image.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 4. Prediction Success State -->
+                            <div id="state-success" class="results-container d-none" aria-live="polite">
+                                <!-- Top Hero: Digit & Confidence -->
+                                <div class="results-hero-section">
+                                    <div class="hero-left">
+                                        <div class="predicted-digit-hero" id="result-digit">0</div>
+                                        <div class="predicted-label-col">
+                                            <span class="predicted-digit-label">Predicted Digit</span>
+                                            <div class="confidence-pill-badge" id="result-confidence">
+                                                Confidence: 0.00%
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" id="predict-again-btn" style="font-size: 0.775rem;">
+                                        Predict Again
+                                    </button>
+                                </div>
+
+                                <!-- Feature 9: Prediction Verification Feedback -->
+                                <div class="feedback-container">
+                                    <div class="feedback-header">
+                                        <span>Was this prediction correct?</span>
+                                        <span class="badge bg-light text-muted border extra-small" id="feedback-status-badge">Unreviewed</span>
+                                    </div>
+                                    <div class="feedback-btn-group">
+                                        <button type="button" class="btn-feedback btn-correct" id="feedback-correct-btn" title="Model predicted correctly">
+                                            <i class="bi bi-hand-thumbs-up"></i> Correct
+                                        </button>
+                                        <button type="button" class="btn-feedback btn-incorrect" id="feedback-incorrect-btn" title="Model made an error">
+                                            <i class="bi bi-hand-thumbs-down"></i> Incorrect
+                                        </button>
+                                    </div>
+                                    <div class="feedback-correction-row d-none" id="feedback-correction-panel">
+                                        <label for="feedback-actual-digit" class="extra-small text-muted mb-0">Actual digit:</label>
+                                        <select class="form-select form-select-sm py-0 px-2 extra-small" style="width: 80px;" id="feedback-actual-digit">
+                                            {% for i in range(10) %}
+                                            <option value="{{ i }}">{{ i }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <button type="button" class="btn btn-sm btn-primary extra-small py-0 px-2" id="feedback-submit-btn">Save</button>
+                                    </div>
+                                </div>
+
+                                <!-- Top 3 Predictions -->
+                                <div>
+                                    <div class="section-mini-heading">
+                                        <span>Top 3 Predictions</span>
+                                        <span class="text-muted extra-small">Ranked</span>
+                                    </div>
+                                    <div id="top-three-list">
+                                        <!-- Dynamically populated via JS -->
+                                    </div>
+                                </div>
+
+                                <!-- Feature 3: Probability for All Digits (0-9) with Chart.js -->
+                                <div>
+                                    <div class="section-mini-heading">
+                                        <span>Probability for all digits (0–9)</span>
+                                        <span class="text-muted extra-small">Softmax</span>
+                                    </div>
+                                    <!-- Chart.js Canvas -->
+                                    <div class="chart-js-wrapper">
+                                        <canvas id="prediction-chart"></canvas>
+                                    </div>
+                                    
+                                    <!-- Vertical visual representation preserved for compatibility -->
+                                    <div class="chart-grid-area d-none" id="vertical-chart-area"></div>
+                                    <div class="chart-x-labels d-none" id="vertical-chart-x-labels"></div>
+                                </div>
+
+                                <!-- Hidden container maintained for 100% test compatibility -->
+                                <div class="d-none" id="probabilities-list"></div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- =================================================================
+                 ROW 2: Three Balanced Supporting Cards (4 cols each)
+                 ================================================================= -->
+            <div class="supporting-grid">
+                
+                <!-- Supporting Card 1: Preprocessing Preview (Feature 5) -->
+                <div class="card-workspace">
+                    <div class="card-header-clean py-2 px-3">
+                        <h2 class="card-header-title">
+                            <i class="bi bi-gear-wide-connected text-primary"></i>
+                            Preprocessing Preview
+                        </h2>
+                        <button type="button" class="btn btn-sm btn-link text-decoration-none extra-small p-0" id="toggle-details-btn" data-bs-toggle="collapse" data-bs-target="#preprocessing-collapse" aria-expanded="false" aria-controls="preprocessing-collapse">
+                            <span id="toggle-details-label">Show Details</span>
+                        </button>
+                    </div>
+
+                    <div class="card-body-clean p-3">
+                        <div class="preview-flow-row">
+                            <div class="preview-step-card">
+                                <img id="detail-original-img" src="#" alt="Original input image" class="step-thumb">
+                                <span class="step-title">Original Image</span>
+                                <span class="step-dim">(Input)</span>
+                            </div>
+                            <span class="flow-arrow-icon">&rarr;</span>
+                            <div class="preview-step-card">
+                                <img id="detail-grayscale-img" src="#" alt="Grayscale preprocessed digit" class="step-thumb">
+                                <span class="step-title">Grayscale</span>
+                                <span class="step-dim">(Processed)</span>
+                            </div>
+                            <span class="flow-arrow-icon">&rarr;</span>
+                            <div class="preview-step-card">
+                                <img id="detail-tensor-img" src="#" alt="Final 28x28 normalized tensor" class="step-thumb pixelated">
+                                <span class="step-title">Cropped &amp; Resized</span>
+                                <span class="step-dim">(28 &times; 28)</span>
+                            </div>
+                        </div>
+
+                        <!-- Expandable Pipeline Steps Explanation (Feature 5) -->
+                        <div class="collapse mb-2" id="preprocessing-collapse">
+                            <div class="bg-light p-2 rounded border extra-small text-muted">
+                                <span class="fw-bold d-block mb-1 text-navy">Pipeline Steps Applied:</span>
+                                <ul class="mb-0 ps-3 extra-small" id="pipeline-steps-list">
+                                    <li>Converted color and transparency to single-channel grayscale.</li>
+                                    <li>Normalized background polarity to match MNIST format.</li>
+                                    <li>Cropped bounding box and resized to 20×20 preserving aspect ratio.</li>
+                                    <li>Centered in 28×28 field using Center of Mass translation.</li>
+                                    <li>Normalized pixel values to [0.0, 1.0] for CNN input.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="info-callout">
+                            <i class="bi bi-info-circle"></i>
+                            <div>The image is converted to grayscale, cropped, resized to 28 &times; 28 pixels, centered and normalized before prediction.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Supporting Card 2: Try Sample Digits (Feature 6) -->
+                <div class="card-workspace">
+                    <div class="card-header-clean py-2 px-3">
+                        <h2 class="card-header-title">
+                            <i class="bi bi-collection text-primary"></i>
+                            Try Sample Digits
+                        </h2>
+                        <button type="button" class="btn btn-sm btn-link text-decoration-none extra-small p-0" id="sample-reload-btn" title="Deselect sample">
+                            Reset
+                        </button>
+                    </div>
+
+                    <div class="card-body-clean p-3">
+                        <div class="sample-grid-2x5" id="sample-gallery-container">
+                            {% for d in range(10) %}
+                            <div class="sample-digit-card" data-digit="{{ d }}" data-src="/samples/sample_digit_{{ d }}.png" role="button" tabindex="0" title="Select Sample Digit {{ d }}">
+                                <img src="/samples/sample_digit_{{ d }}.png" alt="Digit {{ d }}" class="sample-thumb pixelated">
+                                <span class="sample-digit-label">Digit {{ d }}</span>
+                                <span class="d-none sample-ground-truth">Ground Truth: {{ d }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="info-callout">
+                            <i class="bi bi-info-circle"></i>
+                            <div>Click on a sample digit to test the model with example images directly sourced from the MNIST dataset.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Supporting Card 3: Persistent Prediction History (Feature 7 & 8) -->
+                <div class="card-workspace">
+                    <div class="card-header-clean py-2 px-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-clock-history text-primary"></i>
+                            <h2 class="h6 fw-bold text-navy mb-0">Recent Predictions History</h2>
+                            <span class="badge bg-light text-navy border extra-small" id="history-count-badge">0 entries</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-1">
+                            <button type="button" class="btn btn-sm btn-outline-primary extra-small py-0 px-2 d-none" id="export-csv-btn" title="Export CSV">
+                                <i class="bi bi-download"></i> Export CSV
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-danger extra-small py-0 px-2 d-none" id="clear-history-btn" title="Clear history">
+                                <i class="bi bi-trash"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card-body-clean p-3">
+                        <!-- History Search & Filtering Toolbar -->
+                        <div class="history-filter-bar">
+                            <input type="text" class="history-search-input" id="history-search-input" placeholder="Search ID or time..." aria-label="Search prediction history">
+                            <select class="history-filter-select" id="history-filter-digit" aria-label="Filter by predicted digit">
+                                <option value="">All Digits</option>
+                                {% for i in range(10) %}
+                                <option value="{{ i }}">Digit {{ i }}</option>
+                                {% endfor %}
+                            </select>
+                            <select class="history-filter-select" id="history-filter-type" aria-label="Filter by input type">
+                                <option value="">All Inputs</option>
+                                <option value="Canvas">Canvas</option>
+                                <option value="Upload">Upload</option>
+                                <option value="Sample">Sample</option>
+                            </select>
+                            <select class="history-filter-select" id="history-sort-select" aria-label="Sort predictions">
+                                <option value="date_desc">Newest First</option>
+                                <option value="date_asc">Oldest First</option>
+                                <option value="conf_desc">Highest Conf</option>
+                                <option value="conf_asc">Lowest Conf</option>
+                            </select>
+                        </div>
+
+                        <!-- Empty History State -->
+                        <div id="history-empty" class="text-center py-4 text-muted extra-small my-auto">
+                            <i class="bi bi-clock-history text-muted opacity-50 fs-2 mb-2 d-block mx-auto"></i>
+                            No predictions recorded in this browser session yet.<br>Your recent digit predictions will appear here.
+                        </div>
+
+                        <!-- Compact Table View for History Items -->
+                        <div class="history-table-container d-none" id="history-items-container">
+                            <table class="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Digit</th>
+                                        <th>Confidence</th>
+                                        <th>Input</th>
+                                        <th>Time</th>
+                                        <th>Feedback</th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-table-body">
+                                    <!-- Populated dynamically via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- History Telemetry Footer -->
+                        <div class="d-flex justify-content-between align-items-center extra-small text-muted mt-2 pt-1 border-top">
+                            <span id="history-stats-indicator">Observed Feedback Accuracy: --</span>
+                            <span class="badge bg-light text-secondary border">SQLite Synced</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- =========================================================================
+         Modals
+         ========================================================================= -->
+
+    <!-- Modal 1: About Modal -->
+    <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow" style="border-radius: var(--radius);">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold text-navy" id="aboutModalLabel">About Handwritten Digit Recognition</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-secondary small">
+                        This system is a deep learning digit recognition application powered by a Convolutional Neural Network (CNN) trained on the classic MNIST dataset.
+                    </p>
+                    <ul class="text-secondary small ps-3 mb-3">
+                        <li><strong>Model Architecture:</strong> 2D CNN with 2 Convolutional blocks, Max Pooling, Dropout, and Dense layers.</li>
+                        <li><strong>Parameters:</strong> 225,034 trainable weights.</li>
+                        <li><strong>Test Accuracy:</strong> 99.10% on the official 10,000-image test set.</li>
+                        <li><strong>Persistence:</strong> SQLite database with full search, filter, and CSV export.</li>
+                        <li><strong>Interactive Features:</strong> Eraser, Redo, Auto-predict, Chart.js analytics, Feedback collection, and Digit Challenge mode.</li>
+                    </ul>
+                </div>
+                <div class="modal-footer border-top py-2">
+                    <a href="/model-info" class="btn btn-sm btn-primary">View Full Model Info</a>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Keyboard Shortcuts Modal -->
+    <div class="modal fade" id="shortcutsModal" tabindex="-1" aria-labelledby="shortcutsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow" style="border-radius: var(--radius);">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold text-navy" id="shortcutsModalLabel">
+                        <i class="bi bi-keyboard me-1 text-primary"></i> Keyboard Shortcuts
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm small mb-0">
+                            <tbody>
+                                <tr>
+                                    <td><kbd class="shortcut-key">Ctrl</kbd> + <kbd class="shortcut-key">Z</kbd></td>
+                                    <td>Undo last stroke on drawing canvas</td>
+                                </tr>
+                                <tr>
+                                    <td><kbd class="shortcut-key">Ctrl</kbd> + <kbd class="shortcut-key">Y</kbd></td>
+                                    <td>Redo undone stroke on drawing canvas</td>
+                                </tr>
+                                <tr>
+                                    <td><kbd class="shortcut-key">B</kbd></td>
+                                    <td>Switch to Brush tool</td>
+                                </tr>
+                                <tr>
+                                    <td><kbd class="shortcut-key">E</kbd></td>
+                                    <td>Switch to Eraser tool</td>
+                                </tr>
+                                <tr>
+                                    <td><kbd class="shortcut-key">C</kbd></td>
+                                    <td>Clear canvas</td>
+                                </tr>
+                                <tr>
+                                    <td><kbd class="shortcut-key">Enter</kbd></td>
+                                    <td>Predict digit currently drawn on canvas</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer border-top py-2">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Got it</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 3: History Detail Inspector Modal -->
+    <div class="modal fade" id="historyDetailModal" tabindex="-1" aria-labelledby="historyDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow" style="border-radius: var(--radius);">
+                <div class="modal-header border-bottom">
+                    <h5 class="modal-title fw-bold text-navy" id="historyDetailModalLabel">
+                        <i class="bi bi-clock-history text-primary me-1"></i> Prediction Inspection
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body small" id="history-detail-modal-body">
+                    <!-- Populated dynamically via JS -->
+                </div>
+                <div class="modal-footer border-top py-2">
+                    <button type="button" class="btn btn-sm btn-outline-danger" id="history-detail-delete-btn">Delete Record</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container for Asynchronous Notifications -->
+    <div class="toast-container-custom" id="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- =========================================================================
+         Footer
+         ========================================================================= -->
+    <footer class="app-footer">
+        <div class="app-container d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>&copy; 2025 Handwritten Digit Recognition &bull; Academic Mini Project</div>
+            <div>Built with Flask, Bootstrap 5, Chart.js &amp; TensorFlow</div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Custom Application Script (with cache-busting query parameter) -->
+    <script src="{{ url_for('static', filename='js/script.js') }}?v=5.0"></script>
+</body>
+</html>
