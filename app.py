@@ -379,4 +379,4 @@ def handle_internal_server_error(error):
 
 if __name__ == "__main__":
     debug_mode = os.environ.get("FLASK_DEBUG", "0").lower() in ("1", "true")
-    app.run(host="127.0.0.1", port=5000, debug=debug_mode)
+    app.run(host="0.0.0.0", port=5000, debug=debug_mode)

@@ -259,12 +259,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function getCanvasCoordinates(e) {
+        let clientX = e.clientX;
+        let clientY = e.clientY;
+        if (clientX === undefined && e.touches && e.touches.length > 0) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else if (clientX === undefined && e.changedTouches && e.changedTouches.length > 0) {
+            clientX = e.changedTouches[0].clientX;
+            clientY = e.changedTouches[0].clientY;
+        }
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
         return {
-            x: (e.clientX - rect.left) * scaleX,
-            y: (e.clientY - rect.top) * scaleY,
+            x: (clientX - rect.left) * scaleX,
+            y: (clientY - rect.top) * scaleY,
         };
     }
 
@@ -334,48 +343,64 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --- Pointer Events for Canvas (Mouse, Touch, Stylus) ---
+    // --- Unified Drawing Handlers (Pointer, Touch, Mouse) ---
     if (canvas && ctx) {
         initCanvas();
 
-        canvas.addEventListener("pointerdown", (e) => {
+        let lastX = 0;
+        let lastY = 0;
+
+        function startDrawing(e) {
             if (autoPredictTimer) {
                 clearTimeout(autoPredictTimer);
                 autoPredictTimer = null;
             }
 
             isDrawing = true;
-            try {
-                canvas.setPointerCapture(e.pointerId);
-            } catch (_) {}
+            hasDrawn = true;
+            if (e.pointerId !== undefined) {
+                try {
+                    canvas.setPointerCapture(e.pointerId);
+                } catch (_) {}
+            }
 
             const { x, y } = getCanvasCoordinates(e);
+            lastX = x;
+            lastY = y;
+
+            const radius = (isEraserMode ? brushSize * 1.6 : brushSize) / 2;
             ctx.beginPath();
-            ctx.moveTo(x, y);
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = isEraserMode ? "#ffffff" : "#0f172a";
+            ctx.fill();
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const { x, y } = getCanvasCoordinates(e);
+
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(x, y);
             ctx.lineCap = "round";
             ctx.lineJoin = "round";
             ctx.strokeStyle = isEraserMode ? "#ffffff" : "#0f172a";
             ctx.lineWidth = isEraserMode ? brushSize * 1.6 : brushSize;
-
-            ctx.lineTo(x + 0.1, y + 0.1);
             ctx.stroke();
-        });
 
-        canvas.addEventListener("pointermove", (e) => {
-            if (!isDrawing) return;
-            const { x, y } = getCanvasCoordinates(e);
-            ctx.lineTo(x, y);
-            ctx.stroke();
+            lastX = x;
+            lastY = y;
             hasDrawn = true;
-        });
+        }
 
-        const stopDrawing = (e) => {
+        function stopDrawing(e) {
             if (!isDrawing) return;
             isDrawing = false;
-            ctx.closePath();
-            try {
-                canvas.releasePointerCapture(e.pointerId);
-            } catch (_) {}
+            if (e && e.pointerId !== undefined) {
+                try {
+                    canvas.releasePointerCapture(e.pointerId);
+                } catch (_) {}
+            }
             pushCanvasHistory();
 
             // Auto-Predict functionality (~700ms debounce)
@@ -384,12 +409,40 @@ document.addEventListener("DOMContentLoaded", () => {
                     submitCanvasPrediction();
                 }, 700);
             }
-        };
+        }
 
+        // Pointer Events (primary modern input)
+        canvas.addEventListener("pointerdown", startDrawing);
+        canvas.addEventListener("pointermove", draw);
         canvas.addEventListener("pointerup", stopDrawing);
         canvas.addEventListener("pointercancel", stopDrawing);
         canvas.addEventListener("pointerleave", (e) => {
             if (isDrawing && !e.buttons) stopDrawing(e);
+        });
+
+        // Touch event fallbacks (prevent scrolling on touch devices)
+        canvas.addEventListener("touchstart", (e) => {
+            e.preventDefault();
+            startDrawing(e);
+        }, { passive: false });
+        canvas.addEventListener("touchmove", (e) => {
+            e.preventDefault();
+            draw(e);
+        }, { passive: false });
+        canvas.addEventListener("touchend", (e) => {
+            e.preventDefault();
+            stopDrawing(e);
+        }, { passive: false });
+
+        // Mouse fallback for environments where Pointer Events are restricted
+        canvas.addEventListener("mousedown", (e) => {
+            if (e.pointerType === undefined) startDrawing(e);
+        });
+        canvas.addEventListener("mousemove", (e) => {
+            if (e.pointerType === undefined) draw(e);
+        });
+        canvas.addEventListener("mouseup", (e) => {
+            if (e.pointerType === undefined) stopDrawing(e);
         });
 
         // Brush tool listeners
@@ -916,7 +969,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             if (galleryPredictBtn) galleryPredictBtn.disabled = false;
             if (galleryClearBtn) galleryClearBtn.disabled = false;
-            showState("empty");
+            submitSamplePrediction();
         };
 
         card.addEventListener("click", onSelect);
